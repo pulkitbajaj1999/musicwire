@@ -1,0 +1,1 @@
+web: gunicorn musicwire.wsgi --log-file -
