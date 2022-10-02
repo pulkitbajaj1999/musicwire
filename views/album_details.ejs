@@ -1,0 +1,97 @@
+<%- include('./includes/header') %>
+  <div class="container-fluid songs-container">
+    <div class="row">
+
+        <!-- Left Album Info -->
+        <div class="col-sm-4 col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                        <a href="/album/<%= album.id %>" >
+                            <% if (album.imageUrl) { %>
+                                <img src="/static/<%= album.imageUrl %>" class="img-responsive">
+                            <% } else { %>
+                                <img src="/static/<%= defaultAlbumLogo %>" class="img-responsive">
+                            <% } %>
+                        </a>
+                    <h1><%= album.title %> <small><%= album.genre %></small></h1>
+                    <h2><%= album.artist %></h2>
+                </div> 
+            </div>
+        </div>
+        
+        <!-- Right Songs/Add Song -->
+        <div class="col-sm-8 col-md-9">
+
+            <ul class="nav nav-pills" style="margin-bottom: 10px;">
+                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'songs' ? 'active' : '' %>"><a href="/album/<%= album.id %>">View All</a></li>
+                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'add' ? 'active' : '' %>"><a href="/album/<%= album.id %>/addsong">Add New Song</a></li>
+            </ul>
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <% if (rightPanel === 'songs') { %>
+                        <!-- All songs for current album -->
+                        <h3>All Songs</h3>
+
+                        <% if (locals.error_message) { %>
+                            <p><strong><%= error_message %></strong></p>
+                        <% } %>
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Audio File</th>
+                                <th>Favorite</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% for (let song of songs) { %>
+                                <tr>
+                                    <td><%= song.title %></td>
+                                    <td>
+                                        <a target="_blank" href="<%= song.audioFile %>">
+                                            <button type="button" class="btn btn-success btn-xs">
+                                                <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                                            </button>
+                                        </a>
+                                    </td>
+                                    <td>    
+                                        <form action="/song/togglefav" method="post" style="display: inline;">
+                                            <input type="hidden" name="song_id" value="<%= song.id %>" />
+                                            <input type="hidden" name="back_url" value="/album/<%= song.album.id %>" />
+                                            <button type="submit" class="btn-link">
+                                                <span class="glyphicon <%= song.isfavorite ? 'glyphicon-star' : 'glyphicon-star-empty' %>"></span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/song/delete" method="post" style="display: inline;">
+                                            <input type="hidden" name="song_id" value="<%= song.id %>" />
+                                            <input type="hidden" name="back_url" value="/album/<%= song.album.id %>" />
+                                            <button type="submit" class="btn btn-danger btn-xs">
+                                                <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                    <% } else if (rightPanel === 'add') { %>
+                        <!-- Add new song to current album -->
+                        <h3>Add a New Song</h3>
+                        <% if (locals.error_message) { %>
+                            <p><strong><%= error_message %></strong></p>
+                        <% } %>
+                        <!-- Add Music Form -->
+                        <%- include('./forms/add_song') %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</body>
+</html>

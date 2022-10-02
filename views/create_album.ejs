@@ -1,0 +1,19 @@
+<%- include('./includes/header') %>
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>Add a New Album</h3>
+                    <% if (locals.error_message) { %>
+                        <p><strong><%= error_message %></strong></p>
+                    <% } else { %>
+                        <%- include('./forms/add_album') %>
+                    <% } %>
+                </div>
+            </div>
+        </div>        
+    </div>
+  </div>
+</body>
+</html>

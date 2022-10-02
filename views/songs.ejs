@@ -1,0 +1,68 @@
+<%- include('./includes/header') %>
+    <div class="container-fluid songs-container">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="nav nav-pills" style="margin-bottom: 10px;">
+                    <li role="presentation" class="<%= filterBy === 'all' ? 'active' : '' %>"><a href="/song">View All</a></li>
+                    <li role="presentation" class="<%= filterBy === 'favorite' ? 'active' : '' %>"><a href="/song/favorite">Favorites</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Song Title</th>
+                                    <th>Artist</th>
+                                    <th>Audio File</th>
+                                    <th>Album</th>
+                                    <th>Favorite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let song of songs) { %>
+                                    <tr>
+                                        <td><%= song.title %></td>
+                                        <td><%= song.album.artist %></td>
+                                        <td>
+                                            <a target="_blank" href="<%= song.audioFile %>">
+                                                <button type="button" class="btn btn-success btn-xs">
+                                                    <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                                                </button>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="/album/<%= song.album.id %>">
+                                                <img src="/static/<%= song.album.imageUrl %>" class="img-responsive" style="width: 20px; float: left; margin-right: 10px;" />
+                                            </a>
+                                            <a href="/album/<%= song.album.id %>"><%= song.album.title %></a>
+                                        </td>
+                                        <td>
+                                            <form action="/song/togglefav" method="post" style="display: inline;">
+                                                <input type="hidden" name="song_id" value="<%= song.id %>" />
+                                                <input type="hidden" name="back_url" value="/song" />
+                                                <button type="submit" class="btn-link">
+                                                    <span class="glyphicon <%= song.isfavorite ? 'glyphicon-star' : 'glyphicon-star-empty' %>"></span>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>
