@@ -1,18 +1,44 @@
-const staticData = require('../utils/static_data')
+const Album = require('../models/album')
+const Song = require('../models/song')
 
 module.exports.getAllAlbums = (req, res) => {
-  return res.render('albums', {
-    albums: staticData.albums,
-    path: '/album',
-  })
+  Album.find()
+    .lean()
+    .then((albums) => {
+      res.render('albums', {
+        albums: albums,
+        path: '/album',
+      })
+    })
+    .catch((err) => {
+      console.log('Error while fething albums!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
 
 module.exports.getAlbum = (req, res) => {
-  return res.render('album_details', {
-    album: staticData.albums[0],
-    songs: [staticData.songs[0]],
-    rightPanel: 'songs',
-  })
+  const albumId = req.params.albumId
+  Album.findById(albumId)
+    .lean()
+    .then((album) => {
+      if (album) {
+        Song.find({ album: albumId })
+          .lean()
+          .then((songs) => {
+            res.render('album_details', {
+              album: album,
+              songs: songs,
+              rightPanel: 'songs',
+            })
+          })
+      } else {
+        throw Error(`No album found when fetching album: ${albumId}`)
+      }
+    })
+    .catch((err) => {
+      console.log('Error while fething album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
 
 module.exports.getCreateAlbum = (req, res) => {
@@ -20,30 +46,109 @@ module.exports.getCreateAlbum = (req, res) => {
 }
 
 module.exports.postCreateAlbum = (req, res) => {
-  return res.send('<h1>post-album</h1>')
+  const { album_title, artist, genre } = req.body
+  const album = new Album({
+    title: album_title,
+    artist: artist,
+    genre: genre,
+  })
+
+  if (req.files && req.files.album_logo) {
+    album.imageUrl = `/media/albums/${req.files.album_logo[0].filename}`
+  } else {
+    album.imageUrl = '/images/default_album_logo.png'
+  }
+  album
+    .save()
+    .then((album) => {
+      res.redirect('/album')
+    })
+    .catch((err) => {
+      console.log('Error while creating album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
 
 module.exports.postDeleteAlbum = (req, res) => {
+  const albumId = req.body.album_id
   const backUrl = req.body.back_url
-  return res.redirect(backUrl)
+  // delete all songs related to that model
+  Song.deleteMany({ album: albumId })
+    .then((deleteResult) => {
+      if (deleteResult.acknowledged) {
+        return Album.findByIdAndRemove(albumId)
+      } else {
+        throw new Error('Failed to delete all songs contained in album!')
+      }
+    })
+    .then((album) => {
+      if (album) {
+        res.redirect(backUrl)
+      } else {
+        throw new Error('Failed to delete album!')
+      }
+    })
+    .catch((err) => {
+      console.log('Error while deleting album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
+
 module.exports.postToggleFav = (req, res) => {
-  const albumId = parseInt(req.body.album_id)
+  const albumId = req.body.album_id
   const backUrl = req.body.back_url
-  const album = staticData.albums.find((el) => el.id == albumId)
-  if (album) {
-    album.isfavorite = !album.isfavorite
-  }
-  return res.redirect(backUrl)
+  Album.findById(albumId)
+    .then((album) => {
+      if (album) {
+        album.isfavorite = !album.isfavorite
+        return album.save()
+      } else throw new Error('No album found!')
+    })
+    .then((album) => {
+      res.redirect(backUrl)
+    })
+    .catch((err) => {
+      console.log('Error while toggling favorite album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
 
 module.exports.getAddSongToAlbum = (req, res) => {
-  res.render('album_details', {
-    album: staticData.albums[0],
-    rightPanel: 'add',
-  })
+  const albumId = req.params.albumId
+  Album.findById(albumId)
+    .lean()
+    .then((album) => {
+      if (album) {
+        res.render('album_details', {
+          album: album,
+          rightPanel: 'add',
+        })
+      } else {
+        throw Error('No album found')
+      }
+    })
+    .catch((err) => {
+      console.log('Error while fetching add-song to album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }
 
 module.exports.postAddSongToAlbum = (req, res) => {
-  res.redirect('/album')
+  const { song_title, album_id, back_url } = req.body
+  const song = new Song({
+    title: song_title,
+    album: album_id,
+  })
+  if (req.files && req.files.audio_file) {
+    song.audioFile = `/media/songs/${req.files.audio_file[0].filename}`
+  }
+  song
+    .save()
+    .then((song) => {
+      res.redirect(back_url)
+    })
+    .catch((err) => {
+      console.log('Error while adding song to album!\n', err)
+      return res.render('500InternalServerError')
+    })
 }

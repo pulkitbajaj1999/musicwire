@@ -22,8 +22,7 @@ const albumSchema = new Schema({
   },
   imageUrl: {
     type: String,
-    required: true,
-    default: '',
+    required: false,
   },
 })
 

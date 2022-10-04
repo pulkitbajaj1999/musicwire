@@ -6,11 +6,11 @@
         <div class="col-sm-4 col-md-3">
             <div class="panel panel-default">
                 <div class="panel-body">
-                        <a href="/album/<%= album.id %>" >
+                        <a href="/album/<%= album._id %>" >
                             <% if (album.imageUrl) { %>
-                                <img src="/static/<%= album.imageUrl %>" class="img-responsive">
+                                <img src="<%= album.imageUrl %>" class="img-responsive">
                             <% } else { %>
-                                <img src="/static/<%= defaultAlbumLogo %>" class="img-responsive">
+                                <img src="<%= defaultAlbumLogo %>" class="img-responsive">
                             <% } %>
                         </a>
                     <h1><%= album.title %> <small><%= album.genre %></small></h1>
@@ -23,8 +23,8 @@
         <div class="col-sm-8 col-md-9">
 
             <ul class="nav nav-pills" style="margin-bottom: 10px;">
-                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'songs' ? 'active' : '' %>"><a href="/album/<%= album.id %>">View All</a></li>
-                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'add' ? 'active' : '' %>"><a href="/album/<%= album.id %>/addsong">Add New Song</a></li>
+                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'songs' ? 'active' : '' %>"><a href="/album/<%= album._id %>">View All</a></li>
+                <li role="presentation" class="<%= locals.rightPanel && rightPanel === 'add' ? 'active' : '' %>"><a href="/album/<%= album._id %>/addsong">Add New Song</a></li>
             </ul>
 
             <div class="panel panel-default">
@@ -51,7 +51,7 @@
                                 <tr>
                                     <td><%= song.title %></td>
                                     <td>
-                                        <a target="_blank" href="<%= song.audioFile %>">
+                                        <a target="_blank" href="<%= song.audioFile ? song.audioFile : '/404' %>">
                                             <button type="button" class="btn btn-success btn-xs">
                                                 <span class="glyphicon glyphicon-play"></span>&nbsp; Play
                                             </button>
@@ -59,8 +59,8 @@
                                     </td>
                                     <td>    
                                         <form action="/song/togglefav" method="post" style="display: inline;">
-                                            <input type="hidden" name="song_id" value="<%= song.id %>" />
-                                            <input type="hidden" name="back_url" value="/album/<%= song.album.id %>" />
+                                            <input type="hidden" name="song_id" value="<%= song._id %>" />
+                                            <input type="hidden" name="back_url" value="/album/<%= song.album._id %>" />
                                             <button type="submit" class="btn-link">
                                                 <span class="glyphicon <%= song.isfavorite ? 'glyphicon-star' : 'glyphicon-star-empty' %>"></span>
                                             </button>
@@ -68,8 +68,8 @@
                                     </td>
                                     <td>
                                         <form action="/song/delete" method="post" style="display: inline;">
-                                            <input type="hidden" name="song_id" value="<%= song.id %>" />
-                                            <input type="hidden" name="back_url" value="/album/<%= song.album.id %>" />
+                                            <input type="hidden" name="song_id" value="<%= song._id %>" />
+                                            <input type="hidden" name="back_url" value="/album/<%= song.album._id %>" />
                                             <button type="submit" class="btn btn-danger btn-xs">
                                                 <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete
                                             </button>
