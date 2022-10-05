@@ -11,6 +11,7 @@ const multer = require('multer')
 // local imports
 const Album = require('./models/album')
 const Song = require('./models/song')
+const b2 = require('./utils/b2')
 
 // route imports
 const albumRoutes = require('./routes/album')
@@ -43,6 +44,22 @@ app.set('view engine', 'ejs')
 // middlewares
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/media', express.static(path.join(__dirname, 'static', 'media')))
+// use b2 storage to recover static
+app.use('/media', (req, res, next) => {
+  console.log('----using-b2------')
+  const fileKey = req.originalUrl.slice(1)
+  const localBaseFolder = 'static'
+  console.log('---originalUrl:', fileKey)
+  b2.fetchFileToLocal(fileKey, localBaseFolder).then((localFilePath) => {
+    console.log('---localFilePath:', localFilePath)
+    if (localFilePath) {
+      return res.sendFile(path.join(__dirname, localFilePath))
+    } else {
+      return next()
+    }
+  })
+})
+
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use(bodyparser.json())
 // app.use(multer({ storage: uploadedFileStorage }).single('album_logo'))
@@ -99,11 +116,11 @@ app.use('/auth', authRoutes)
 
 // use not-Found
 const notFoundRoute = (req, res, next) => {
-  return res.render('404NotFound')
+  return res.status(404).render('404NotFound')
 }
 app.get('/404', notFoundRoute)
 app.get('/500', (req, res) => {
-  return res.render('500InternalServerError')
+  return res.status(500).render('500InternalServerError')
 })
 app.use(notFoundRoute)
 

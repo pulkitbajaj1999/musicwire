@@ -1,3 +1,5 @@
+const b2 = require('../utils/b2')
+
 const Album = require('../models/album')
 const Song = require('../models/song')
 
@@ -45,7 +47,7 @@ module.exports.getCreateAlbum = (req, res) => {
   return res.render('create_album', { path: '/album/add' })
 }
 
-module.exports.postCreateAlbum = (req, res) => {
+module.exports.postCreateAlbum = async (req, res) => {
   const { album_title, artist, genre } = req.body
   const album = new Album({
     title: album_title,
@@ -53,9 +55,23 @@ module.exports.postCreateAlbum = (req, res) => {
     genre: genre,
   })
 
+  // if image for album logo is uploaded then store it to b2 bucket
   if (req.files && req.files.album_logo) {
-    album.imageUrl = `/media/albums/${req.files.album_logo[0].filename}`
-  } else {
+    try {
+      const file = req.files.album_logo[0]
+      const filePath = file.path
+      const fileUrl = `media/albums/${file.filename}`
+      const uploadResult = await b2.uploadFile(filePath, fileUrl)
+      console.log('-----uploadresult----\n', uploadResult)
+      album.imageUrl = '/' + uploadResult.Key // file-key will act as a file path on b2
+    } catch (err) {
+      // in case of error store the default logo as imageurl and log the result
+      console.log('Error while storing file on b2!\n', err)
+      album.imageUrl = '/images/default_album_logo.png'
+    }
+  }
+  // else store the default logo
+  else {
     album.imageUrl = '/images/default_album_logo.png'
   }
   album
@@ -133,14 +149,24 @@ module.exports.getAddSongToAlbum = (req, res) => {
     })
 }
 
-module.exports.postAddSongToAlbum = (req, res) => {
+module.exports.postAddSongToAlbum = async (req, res) => {
   const { song_title, album_id, back_url } = req.body
   const song = new Song({
     title: song_title,
     album: album_id,
   })
   if (req.files && req.files.audio_file) {
-    song.audioFile = `/media/songs/${req.files.audio_file[0].filename}`
+    try {
+      const file = req.files.audio_file[0]
+      const filePath = file.path
+      const fileUrl = `media/songs/${file.filename}`
+      const uploadResult = await b2.uploadFile(filePath, fileUrl)
+      console.log('-----uploadresult----\n', uploadResult)
+      song.audioFile = '/' + uploadResult.Key
+    } catch (err) {
+      console.log('Error while storing file on b2!\n', err)
+      song.audioFile = `/media/songs/${file.filename}`
+    }
   }
   song
     .save()
