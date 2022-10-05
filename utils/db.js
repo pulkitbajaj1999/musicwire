@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 module.exports.dbConnect = (uri) => {
-  console.log('---uri:', uri)
   return mongoose
     .connect(uri, {
       useNewUrlParser: true,

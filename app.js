@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 
 // third-party imports
+require('dotenv').config()
 const express = require('express')
 const bodyparser = require('body-parser')
 const multer = require('multer')
@@ -107,9 +108,10 @@ app.get('/500', (req, res) => {
 app.use(notFoundRoute)
 
 // declare host and port
-const PORT = 3000
-const HOST = '0.0.0.0'
-const MONGODB_URI = 'mongodb://localhost:27017/musicwire'
+const PORT = process.env.PORT || 3000
+const HOST = process.env.HOST || '0.0.0.0'
+const MONGODB_URI =
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/musicwire'
 
 // start server
 ;(() => {
