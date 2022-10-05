@@ -58,7 +58,7 @@ module.exports.togglefavorite = (req, res) => {
 module.exports.postDeleteSong = (req, res) => {
   const songId = req.body.song_id
   const backUrl = req.body.back_url
-  Song.findByIdAndRemove(songId)
+  Song.findByIdAndDelete(songId)
     .then((song) => {
       if (song) {
         res.redirect(backUrl)

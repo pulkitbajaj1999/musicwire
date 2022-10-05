@@ -45,7 +45,7 @@
                                         <td>
                                             <form action="/song/togglefav" method="post" style="display: inline;">
                                                 <input type="hidden" name="song_id" value="<%= song._id %>" />
-                                                <input type="hidden" name="back_url" value="/song" />
+                                                <input type="hidden" name="back_url" value="<%= locals.filterBy && filterBy==='favorite' ? '/song/favorite' : '/song' %>" />
                                                 <button type="submit" class="btn-link">
                                                     <span class="glyphicon <%= song.isfavorite ? 'glyphicon-star' : 'glyphicon-star-empty' %>"></span>
                                                 </button>

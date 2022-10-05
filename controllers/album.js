@@ -76,7 +76,7 @@ module.exports.postDeleteAlbum = (req, res) => {
   Song.deleteMany({ album: albumId })
     .then((deleteResult) => {
       if (deleteResult.acknowledged) {
-        return Album.findByIdAndRemove(albumId)
+        return Album.findByIdAndDelete(albumId)
       } else {
         throw new Error('Failed to delete all songs contained in album!')
       }

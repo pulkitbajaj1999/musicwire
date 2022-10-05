@@ -53,27 +53,36 @@ app.use(
 )
 
 // define routes
-app.get('/', (req, res) => {
+app.get(['/', '/home'], async (req, res) => {
   const searchQuery = req.query.q ? req.query.q : ''
-  Album.find()
-    .lean()
-    .then((albums) => {
-      Song.find()
-        .lean()
-        .populate('album')
-        .then((songs) => {
-          return res.render('albums', {
-            albums: albums,
-            songs: songs,
-            searchQuery: searchQuery,
-            path: '/',
-          })
-        })
-    })
-    .catch((err) => {
-      console.log('Error while fething index!\n', err)
-      return res.render('internal_server_error')
-    })
+  let albums = []
+  let songs = []
+  try {
+    if (searchQuery) {
+      albums = await Album.find({
+        $or: [
+          { title: { $regex: searchQuery, $options: 'i' } },
+          { artist: { $regex: searchQuery, $options: 'i' } },
+          { genre: { $regex: searchQuery, $options: 'i' } },
+        ],
+      }).lean()
+      songs = await Song.find({
+        title: { $regex: searchQuery, $options: 'i' },
+      }).lean()
+    } else {
+      albums = await Album.find().lean()
+      songs = await Song.find().populate('album').lean()
+    }
+  } catch (err) {
+    console.log('Error while fething index!\n', err)
+    return res.render('500InternalServerError')
+  }
+  return res.render('albums', {
+    albums: albums,
+    songs: songs,
+    searchQuery: searchQuery,
+    path: '/',
+  })
 })
 
 app.get('/test', (req, res) => {
