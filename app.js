@@ -121,7 +121,9 @@ app.get(['/', '/home'], async (req, res) => {
       }).lean()
       songs = await Song.find({
         title: { $regex: searchQuery, $options: 'i' },
-      }).lean()
+      })
+        .populate('album')
+        .lean()
     } else {
       albums = await Album.find().lean()
       songs = await Song.find().populate('album').lean()
