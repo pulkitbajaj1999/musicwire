@@ -40,6 +40,8 @@
                 <% } else { %>
                     <!-- Not Authenticated -->
                     <ul class="nav navbar-nav navbar-right">
+                        <form action="/auth/guest" id="guestLoginForm" method="post"></form>
+                        <li><a href="" onclick="guestLogin(event)">Guest</a></li>
                         <li class="<%= (locals.path && path === '/auth/signup') ? 'active' : '' %>"><a href="/auth/signup">Sign Up</a></li>
                         <li class="<%= (locals.path && path=== '/auth/login') ? 'active' : '' %>"><a href="/auth/login">Log In</a></li>
                     </ul>
@@ -47,3 +49,9 @@
         </div>
     </div>
 </nav>
+<script>
+    function guestLogin(event) {
+        event.preventDefault()
+        document.getElementById('guestLoginForm').submit()
+    }
+</script>

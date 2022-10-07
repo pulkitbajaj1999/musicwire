@@ -1,6 +1,12 @@
 const bcryptjs = require('bcryptjs')
 const User = require('../models/user')
 
+const GUEST_USER = {
+  username: 'guest171112236',
+  email: 'guest171112236@musicwire',
+  password: '$2a$12$xfPpVI7xpM7vXyAXtQ0yg.d/OiIXdEnXkboAL4gIT4m/rX0C1B2F6',
+}
+
 module.exports.getLogin = (req, res) => {
   return res.render('auth/login', {
     data: 'get login',
@@ -109,5 +115,36 @@ module.exports.postSignup = (req, res) => {
     .catch((err) => {
       console.log('Error while creating user!\n', err)
       res.render('500InternalServerError', { isLoggedIn: req.isLoggedIn })
+    })
+}
+
+module.exports.postGuestLogin = (req, res) => {
+  User.findOne({ username: 'guest171112236' })
+    .then((guest) => {
+      if (guest) {
+        return guest
+      } else {
+        guest = new User({ ...GUEST_USER })
+        return guest.save()
+      }
+    })
+    .then((guest) => {
+      console.log('User guest\n', guest)
+      req.session.user = { _id: guest._id.toString() }
+      req.session.isLoggedIn = true
+      req.session.save((err) => {
+        if (err) {
+          console.log('Error while saving guest session!\n', err)
+          res.render('500InternalServerError', {
+            isLoggedIn: req.isLoggedIn,
+          })
+        } else {
+          res.redirect('/')
+        }
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+      res.render('500InternalServerError')
     })
 }
