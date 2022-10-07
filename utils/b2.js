@@ -1,6 +1,5 @@
 const path = require('path')
 const fs = require('fs')
-const fsPromises = fs.promises
 const S3 = require('aws-sdk/clients/s3')
 
 const s3 = new S3({
@@ -10,19 +9,51 @@ const s3 = new S3({
   signatureVersion: 'v4',
 })
 
-// uploads a file to b2
-module.exports.uploadFile = (fileStreamPath, fileUploadPath) => {
-  const fileStream = fs.createReadStream(fileStreamPath)
+// uploads a file to B2
+module.exports.uploadFile = (fileKey, localFilePath) => {
+  const fileStream = fs.createReadStream(localFilePath)
   return s3
     .upload({
-      Key: fileUploadPath,
+      Key: fileKey,
       Bucket: process.env.B2_BUCKET_NAME,
       Body: fileStream,
     })
     .promise()
+    .then((result) => {
+      console.log('File uploaded to B2...\n', result)
+      return result
+    })
+    .catch((err) => {
+      console.log('Error while uploading file to B2\n', err)
+      return null
+    })
 }
 
-// downloads a file from b2
+// fetch a file from B2 to local storage
+module.exports.fetchFileToLocal = (fileKey, localBaseFolder) => {
+  return s3
+    .getObject({
+      Bucket: process.env.B2_BUCKET_NAME,
+      Key: fileKey,
+    })
+    .promise()
+    .then((result) => {
+      console.log('File fetched from B2...\n', result)
+      const filePath = path.join(localBaseFolder, fileKey)
+      const dirPath = path.dirname(filePath)
+      fs.mkdirSync(dirPath, { recursive: true })
+      fs.promises.writeFile(filePath, result.Body).then(() => {
+        console.log(`File ${filePath} is written to local storage...`)
+      })
+      return result.Body
+    })
+    .catch((err) => {
+      console.log('Error while getting object from B2!\n', err)
+      return null
+    })
+}
+
+// get filestream for downloading from b2
 module.exports.getFileStream = async (fileKey) => {
   try {
     const params = {
@@ -35,33 +66,4 @@ module.exports.getFileStream = async (fileKey) => {
     console.log('Error while creating read-stream!\n', err)
     return null
   }
-}
-
-module.exports.fetchFileToLocal = (fileKey, localBaseFolder) => {
-  // fileKey = 'temp/ap_dhilon.jpg'
-  // localBaseFolder = 'static'
-  return s3
-    .getObject({
-      Bucket: process.env.B2_BUCKET_NAME,
-      Key: fileKey,
-    })
-    .promise()
-    .then((result) => {
-      console.log('b2-result: ', result)
-      console.log('body', result.Body)
-      const dirPath = path.join(localBaseFolder, path.dirname(fileKey))
-      const localFilePath = path.join(dirPath, path.basename(fileKey))
-      return fsPromises.mkdir(dirPath, { recursive: true }).then(() => {
-        return fsPromises
-          .writeFile(localFilePath, result.Body)
-          .then((result) => {
-            console.log('fs-result:', result)
-            return localFilePath
-          })
-      })
-    })
-    .catch((err) => {
-      console.log('err', err)
-      return null
-    })
 }

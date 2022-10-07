@@ -1,3 +1,4 @@
+const path = require('path')
 const b2 = require('../utils/b2')
 
 const Album = require('../models/album')
@@ -57,16 +58,12 @@ module.exports.postCreateAlbum = async (req, res) => {
 
   // if image for album logo is uploaded then store it to b2 bucket
   if (req.files && req.files.album_logo) {
-    try {
-      const file = req.files.album_logo[0]
-      const filePath = file.path
-      const fileUrl = `media/albums/${file.filename}`
-      const uploadResult = await b2.uploadFile(filePath, fileUrl)
-      console.log('-----uploadresult----\n', uploadResult)
+    const file = req.files.album_logo[0]
+    const fileKey = `media/albums/${file.filename}`
+    const uploadResult = await b2.uploadFile(fileKey, file.path)
+    if (uploadResult) {
       album.imageUrl = '/' + uploadResult.Key // file-key will act as a file path on b2
-    } catch (err) {
-      // in case of error store the default logo as imageurl and log the result
-      console.log('Error while storing file on b2!\n', err)
+    } else {
       album.imageUrl = '/images/default_album_logo.png'
     }
   }
@@ -156,16 +153,11 @@ module.exports.postAddSongToAlbum = async (req, res) => {
     album: album_id,
   })
   if (req.files && req.files.audio_file) {
-    try {
-      const file = req.files.audio_file[0]
-      const filePath = file.path
-      const fileUrl = `media/songs/${file.filename}`
-      const uploadResult = await b2.uploadFile(filePath, fileUrl)
-      console.log('-----uploadresult----\n', uploadResult)
-      song.audioFile = '/' + uploadResult.Key
-    } catch (err) {
-      console.log('Error while storing file on b2!\n', err)
-      song.audioFile = `/media/songs/${file.filename}`
+    const file = req.files.audio_file[0]
+    const fileKey = `media/songs/${file.filename}`
+    const uploadResult = await b2.uploadFile(fileKey, file.path)
+    if (uploadResult) {
+      song.audioFile = '/' + uploadResult.Key // file-key will act as a file path on b2
     }
   }
   song

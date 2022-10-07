@@ -21,7 +21,7 @@ const authRoutes = require('./routes/auth')
 // initialize variables
 const dbConnect = require('./utils/db').dbConnect
 const app = express()
-const uploadedFileStorage = multer.diskStorage({
+const multerStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, new Date().getTime() + '-' + file.originalname)
   },
@@ -37,38 +37,53 @@ const uploadedFileStorage = multer.diskStorage({
     }
   },
 })
+const multerMiddleware = multer({
+  storage: multerStorage,
+  limits: {
+    fileSize: (process.env.MULTER_MAX_FILE_SIZE || 1) * 1024 * 1024,
+  },
+}).fields([
+  { name: 'album_logo', maxCount: 1 },
+  { name: 'audio_file', maxCount: 1 },
+])
 
 // set view engine for templating
 app.set('view engine', 'ejs')
 
 // middlewares
+// serve public files from static storage
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/media', express.static(path.join(__dirname, 'static', 'media')))
-// use b2 storage to recover static
-app.use('/media', (req, res, next) => {
-  console.log('----using-b2------')
-  const fileKey = req.originalUrl.slice(1)
-  const localBaseFolder = 'static'
-  console.log('---originalUrl:', fileKey)
-  b2.fetchFileToLocal(fileKey, localBaseFolder).then((localFilePath) => {
-    console.log('---localFilePath:', localFilePath)
-    if (localFilePath) {
-      return res.sendFile(path.join(__dirname, localFilePath))
-    } else {
-      return next()
-    }
-  })
-})
+// use check in local storage for serving media files else fetch from B2 storage
+app.use(
+  '/media',
+  express.static(path.join(__dirname, 'static', 'media')),
+  (req, res, next) => {
+    const localBaseFolder = 'static'
+    const fileKey = req.originalUrl.startsWith('/')
+      ? req.originalUrl.slice(1)
+      : req.originalUrl
+    b2.fetchFileToLocal(fileKey, localBaseFolder).then((buffer) => {
+      if (buffer) {
+        return res.send(buffer)
+      } else {
+        return next()
+      }
+    })
+  }
+)
 
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use(bodyparser.json())
-// app.use(multer({ storage: uploadedFileStorage }).single('album_logo'))
-app.use(
-  multer({ storage: uploadedFileStorage }).fields([
-    { name: 'album_logo', maxCount: 1 },
-    { name: 'audio_file', maxCount: 1 },
-  ])
-)
+// using multer-middleware function to parse files and handle error if any
+app.use((req, res, next) => {
+  multerMiddleware(req, res, (err) => {
+    if (err) {
+      console.log('Error while storing files using multer storage!\n', err)
+      req.multerError = err
+    }
+    next()
+  })
+})
 
 // define routes
 app.get(['/', '/home'], async (req, res) => {
