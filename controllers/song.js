@@ -9,11 +9,14 @@ module.exports.getAllSongs = (req, res) => {
         songs: songs,
         filterBy: 'all',
         path: '/song',
+        isLoggedIn: req.isLoggedIn,
       })
     })
     .catch((err) => {
       console.log('Error while getting all songs!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -26,11 +29,14 @@ module.exports.getfavoriteSongs = (req, res) => {
         songs: songs,
         filterBy: 'favorite',
         path: '/song/favorite',
+        isLoggedIn: req.isLoggedIn,
       })
     })
     .catch((err) => {
       console.log('Error while getting all songs!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -51,7 +57,9 @@ module.exports.togglefavorite = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while toggling faorite song!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -68,6 +76,8 @@ module.exports.postDeleteSong = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while deleting song!')
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }

@@ -11,11 +11,14 @@ module.exports.getAllAlbums = (req, res) => {
       res.render('albums', {
         albums: albums,
         path: '/album',
+        isLoggedIn: req.isLoggedIn,
       })
     })
     .catch((err) => {
       console.log('Error while fething albums!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -32,6 +35,7 @@ module.exports.getAlbum = (req, res) => {
               album: album,
               songs: songs,
               rightPanel: 'songs',
+              isLoggedIn: req.isLoggedIn,
             })
           })
       } else {
@@ -40,12 +44,17 @@ module.exports.getAlbum = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while fething album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
 module.exports.getCreateAlbum = (req, res) => {
-  return res.render('create_album', { path: '/album/add' })
+  return res.render('create_album', {
+    path: '/album/add',
+    isLoggedIn: req.isLoggedIn,
+  })
 }
 
 module.exports.postCreateAlbum = async (req, res) => {
@@ -78,7 +87,9 @@ module.exports.postCreateAlbum = async (req, res) => {
     })
     .catch((err) => {
       console.log('Error while creating album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -103,7 +114,9 @@ module.exports.postDeleteAlbum = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while deleting album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -122,7 +135,9 @@ module.exports.postToggleFav = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while toggling favorite album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -135,6 +150,7 @@ module.exports.getAddSongToAlbum = (req, res) => {
         res.render('album_details', {
           album: album,
           rightPanel: 'add',
+          isLoggedIn: req.isLoggedIn,
         })
       } else {
         throw Error('No album found')
@@ -142,7 +158,9 @@ module.exports.getAddSongToAlbum = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while fetching add-song to album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }
 
@@ -167,6 +185,8 @@ module.exports.postAddSongToAlbum = async (req, res) => {
     })
     .catch((err) => {
       console.log('Error while adding song to album!\n', err)
-      return res.render('500InternalServerError')
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+      })
     })
 }

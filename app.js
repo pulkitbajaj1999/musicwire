@@ -7,20 +7,24 @@ require('dotenv').config()
 const express = require('express')
 const bodyparser = require('body-parser')
 const multer = require('multer')
+const session = require('express-session')
+const MongoDBStore = require('connect-mongodb-session')(session)
 
 // local imports
 const Album = require('./models/album')
 const Song = require('./models/song')
 const b2 = require('./utils/b2')
+const dbConnect = require('./utils/db').dbConnect
+const authenticateSessionMiddleware = require('./middlewares/authenticateSession')
 
 // route imports
 const albumRoutes = require('./routes/album')
 const songRoutes = require('./routes/song')
 const authRoutes = require('./routes/auth')
 
-// initialize variables
-const dbConnect = require('./utils/db').dbConnect
+// required objects
 const app = express()
+app.set('view engine', 'ejs')
 const multerStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, new Date().getTime() + '-' + file.originalname)
@@ -47,13 +51,26 @@ const multerMiddleware = multer({
   { name: 'audio_file', maxCount: 1 },
 ])
 
-// set view engine for templating
-app.set('view engine', 'ejs')
+const mongodbSessionStore = new MongoDBStore({
+  uri: process.env.MONGODB_URI,
+  collection: 'session',
+})
 
 // middlewares
+// set up session using mongodb-store
+app.use(
+  session({
+    secret: 'musicwire-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    store: mongodbSessionStore,
+    cookie: { maxAge: 60 * 60 * 1000 },
+  })
+)
+app.use(authenticateSessionMiddleware)
 // serve public files from static storage
 app.use(express.static(path.join(__dirname, 'public')))
-// use check in local storage for serving media files else fetch from B2 storage
+// check in local storage for serving media files else fetch from B2 storage
 app.use(
   '/media',
   express.static(path.join(__dirname, 'static', 'media')),
@@ -87,6 +104,9 @@ app.use((req, res, next) => {
 
 // define routes
 app.get(['/', '/home'], async (req, res) => {
+  if (!req.isLoggedIn) {
+    return res.redirect('/auth/login')
+  }
   const searchQuery = req.query.q ? req.query.q : ''
   let albums = []
   let songs = []
@@ -108,19 +128,21 @@ app.get(['/', '/home'], async (req, res) => {
     }
   } catch (err) {
     console.log('Error while fething index!\n', err)
-    return res.render('500InternalServerError')
+    return res.render('500InternalServerError', { isLoggedIn: req.isLoggedIn })
   }
   return res.render('albums', {
     albums: albums,
     songs: songs,
     searchQuery: searchQuery,
     path: '/',
+    isLoggedIn: req.isLoggedIn,
   })
 })
 
 app.get('/test', (req, res) => {
   return res.render('test', {
     data: '',
+    isLoggedIn: req.isLoggedIn,
   })
 })
 
