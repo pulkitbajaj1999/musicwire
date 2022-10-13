@@ -12,12 +12,14 @@ module.exports.getAllAlbums = (req, res) => {
         albums: albums,
         path: '/album',
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
     .catch((err) => {
       console.log('Error while fething albums!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -36,6 +38,7 @@ module.exports.getAlbum = (req, res) => {
               songs: songs,
               rightPanel: 'songs',
               isLoggedIn: req.isLoggedIn,
+              csrf_token: req.csrfToken(),
             })
           })
       } else {
@@ -46,6 +49,7 @@ module.exports.getAlbum = (req, res) => {
       console.log('Error while fething album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -54,6 +58,7 @@ module.exports.getCreateAlbum = (req, res) => {
   return res.render('create_album', {
     path: '/album/add',
     isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
   })
 }
 
@@ -89,6 +94,7 @@ module.exports.postCreateAlbum = async (req, res) => {
       console.log('Error while creating album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -116,6 +122,7 @@ module.exports.postDeleteAlbum = (req, res) => {
       console.log('Error while deleting album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -137,6 +144,7 @@ module.exports.postToggleFav = (req, res) => {
       console.log('Error while toggling favorite album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -151,6 +159,7 @@ module.exports.getAddSongToAlbum = (req, res) => {
           album: album,
           rightPanel: 'add',
           isLoggedIn: req.isLoggedIn,
+          csrf_token: req.csrfToken(),
         })
       } else {
         throw Error('No album found')
@@ -160,6 +169,7 @@ module.exports.getAddSongToAlbum = (req, res) => {
       console.log('Error while fetching add-song to album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -187,6 +197,7 @@ module.exports.postAddSongToAlbum = async (req, res) => {
       console.log('Error while adding song to album!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }

@@ -1,4 +1,4 @@
-<%- include('../includes/header.ejs') %>
+<%- include('../includes/header.ejs', { csrf_token }) %>
   <div class="container-fluid">
       <div class="row">
           <div class="col-sm-12 col-md-6">
@@ -9,7 +9,7 @@
                           <p><strong><%= error_message %></strong></p>
                       <% } %>
                       <form class="form-horizontal" role="form" action="/auth/login" method="post" enctype="multipart/form-data">
-                          <!-- {% csrf_token %} -->
+                          <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                           <div class="form-group">
                               <label class="control-label col-sm-2" for="id_username">
                                   Username:

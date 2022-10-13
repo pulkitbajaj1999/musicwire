@@ -9,6 +9,9 @@ const bodyparser = require('body-parser')
 const multer = require('multer')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const csurf = require('csurf')
+const helmet = require('helmet')
+const compression = require('compression')
 
 // local imports
 const Album = require('./models/album')
@@ -57,6 +60,33 @@ const mongodbSessionStore = new MongoDBStore({
 })
 
 // middlewares
+// securing headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'script-src': ["'self'", "'unsafe-inline'"],
+        'script-src-attr': ["'unsafe-inline'"],
+      },
+    },
+  })
+)
+app.use(compression())
+
+app.use(bodyparser.urlencoded({ extended: true }))
+app.use(bodyparser.json())
+// using multer-middleware function to parse files and handle error if any
+app.use((req, res, next) => {
+  multerMiddleware(req, res, (err) => {
+    if (err) {
+      console.log('Error while storing files using multer storage!\n', err)
+      req.multerError = err
+    }
+    next()
+  })
+})
+
 // set up session using mongodb-store
 app.use(
   session({
@@ -68,7 +98,8 @@ app.use(
   })
 )
 app.use(authenticateSessionMiddleware)
-// serve public files from static storage
+app.use(csurf())
+// serve public files
 app.use(express.static(path.join(__dirname, 'public')))
 // check in local storage for serving media files else fetch from B2 storage
 app.use(
@@ -88,19 +119,6 @@ app.use(
     })
   }
 )
-
-app.use(bodyparser.urlencoded({ extended: true }))
-app.use(bodyparser.json())
-// using multer-middleware function to parse files and handle error if any
-app.use((req, res, next) => {
-  multerMiddleware(req, res, (err) => {
-    if (err) {
-      console.log('Error while storing files using multer storage!\n', err)
-      req.multerError = err
-    }
-    next()
-  })
-})
 
 // define routes
 app.get(['/', '/home'], async (req, res) => {
@@ -130,7 +148,10 @@ app.get(['/', '/home'], async (req, res) => {
     }
   } catch (err) {
     console.log('Error while fething index!\n', err)
-    return res.render('500InternalServerError', { isLoggedIn: req.isLoggedIn })
+    return res.render('500InternalServerError', {
+      isLoggedIn: req.isLoggedIn,
+      csrf_token: req.csrfToken(),
+    })
   }
   return res.render('albums', {
     albums: albums,
@@ -138,6 +159,7 @@ app.get(['/', '/home'], async (req, res) => {
     searchQuery: searchQuery,
     path: '/',
     isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
   })
 })
 
@@ -145,6 +167,7 @@ app.get('/test', (req, res) => {
   return res.render('test', {
     data: '',
     isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
   })
 })
 
@@ -155,11 +178,17 @@ app.use('/auth', authRoutes)
 
 // use not-Found
 const notFoundRoute = (req, res, next) => {
-  return res.status(404).render('404NotFound')
+  return res.status(404).render('404NotFound', {
+    isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
+  })
 }
 app.get('/404', notFoundRoute)
 app.get('/500', (req, res) => {
-  return res.status(500).render('500InternalServerError')
+  return res.status(500).render('500InternalServerError', {
+    isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
+  })
 })
 app.use(notFoundRoute)
 

@@ -10,12 +10,14 @@ module.exports.getAllSongs = (req, res) => {
         filterBy: 'all',
         path: '/song',
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
     .catch((err) => {
       console.log('Error while getting all songs!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -30,12 +32,14 @@ module.exports.getfavoriteSongs = (req, res) => {
         filterBy: 'favorite',
         path: '/song/favorite',
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
     .catch((err) => {
       console.log('Error while getting all songs!\n', err)
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }
@@ -78,6 +82,7 @@ module.exports.postDeleteSong = (req, res) => {
       console.log('Error while deleting song!')
       return res.render('500InternalServerError', {
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     })
 }

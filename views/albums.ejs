@@ -1,4 +1,4 @@
-<%- include('./includes/header') %>
+<%- include('./includes/header', { csrf_token }) %>
 <div class="albums-container container-fluid">
     <!-- Albums -->
     <div class="row">
@@ -21,6 +21,7 @@
 
                             <!-- Delete Album -->
                             <form action="/album/delete" method="post" style="display: inline;">
+                                <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                 <input type="hidden" name="album_id" value="<%= album._id %>" />
                                 <input type="hidden" name="back_url" value="<%= locals.songs ? '/' : '/album' %>" />
                                 <button type="submit" class="btn btn-default btn-sm">
@@ -30,6 +31,7 @@
 
                             <!-- Favorite Album -->
                             <form action="/album/togglefav" method="post" style="display: inline;">
+                                <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                 <input type="hidden" name="album_id" value="<%= album._id %>" />
                                 <input type="hidden" name="back_url" value="<%= locals.songs ? '/' : '/album' %>" />
                                 <button type="submit" class="btn btn-default btn-sm btn-favorite">
@@ -92,6 +94,7 @@
                                         </td>
                                         <td>
                                             <form action="/song/togglefav" method="post" style="display: inline;">
+                                                <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                                 <input type="hidden" name="song_id" value="<%= song._id %>" />
                                                 <input type="hidden" name="back_url" value="/" />
                                                 <button type="submit" class="btn-link">

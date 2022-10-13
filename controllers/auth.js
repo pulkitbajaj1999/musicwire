@@ -12,6 +12,7 @@ module.exports.getLogin = (req, res) => {
     data: 'get login',
     path: '/auth/login',
     isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
   })
 }
 
@@ -32,6 +33,7 @@ module.exports.postLogin = (req, res) => {
               console.log('Error while saving session!\n', err)
               res.render('500InternalServerError', {
                 isLoggedIn: req.isLoggedIn,
+                csrf_token: req.csrfToken(),
               })
             } else {
               res.redirect('/')
@@ -43,6 +45,7 @@ module.exports.postLogin = (req, res) => {
           res.render('auth/login', {
             error_message: 'Password is Incorrect. Please check and try again!',
             isLoggedIn: req.isLoggedIn,
+            csrf_token: req.csrfToken(),
           })
         }
       })
@@ -52,16 +55,20 @@ module.exports.postLogin = (req, res) => {
       res.render('auth/login', {
         error_message: 'User does not exist. Please try again!',
         isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
       })
     }
   })
 }
 
-module.exports.getLogout = (req, res) => {
+module.exports.postLogout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.log('Error while destroying session!\n', err)
-      res.render('500InternalServerError', { isLoggedIn: req.isLoggedIn })
+      res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
+      })
     } else {
       res.redirect('/auth/login')
     }
@@ -73,6 +80,7 @@ module.exports.getSignup = (req, res) => {
     data: 'sign up',
     path: '/auth/signup',
     isLoggedIn: req.isLoggedIn,
+    csrf_token: req.csrfToken(),
   })
 }
 
@@ -82,6 +90,7 @@ module.exports.postSignup = (req, res) => {
     return res.render('auth/signup', {
       error_message: 'Invalid username or password!',
       isLoggedIn: req.isLoggedIn,
+      csrf_token: req.csrfToken(),
     })
   }
   // check if user exists
@@ -92,6 +101,7 @@ module.exports.postSignup = (req, res) => {
         res.render('auth/signup', {
           error_message: 'Username already taken, use another!',
           isLoggedIn: req.isLoggedIn,
+          csrf_token: req.csrfToken(),
         })
       }
       // else create a new user in database with hashed password
@@ -114,7 +124,10 @@ module.exports.postSignup = (req, res) => {
     })
     .catch((err) => {
       console.log('Error while creating user!\n', err)
-      res.render('500InternalServerError', { isLoggedIn: req.isLoggedIn })
+      res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
+      })
     })
 }
 
@@ -137,6 +150,7 @@ module.exports.postGuestLogin = (req, res) => {
           console.log('Error while saving guest session!\n', err)
           res.render('500InternalServerError', {
             isLoggedIn: req.isLoggedIn,
+            csrf_token: req.csrfToken(),
           })
         } else {
           res.redirect('/')
@@ -145,6 +159,9 @@ module.exports.postGuestLogin = (req, res) => {
     })
     .catch((err) => {
       console.log(err)
-      res.render('500InternalServerError')
+      res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
+      })
     })
 }

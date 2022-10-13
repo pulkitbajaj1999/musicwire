@@ -1,4 +1,4 @@
-<%- include('./includes/header') %>
+<%- include('./includes/header', { csrf_token }) %>
     <div class="container-fluid songs-container">
 
         <div class="row">
@@ -44,6 +44,7 @@
                                         </td>
                                         <td>
                                             <form action="/song/togglefav" method="post" style="display: inline;">
+                                                <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                                 <input type="hidden" name="song_id" value="<%= song._id %>" />
                                                 <input type="hidden" name="back_url" value="<%= locals.filterBy && filterBy==='favorite' ? '/song/favorite' : '/song' %>" />
                                                 <button type="submit" class="btn-link">

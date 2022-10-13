@@ -1,4 +1,4 @@
-<%- include('./includes/header') %>
+<%- include('./includes/header', { csrf_token }) %>
     <h1><%- locals.data ? locals.data : '<center>Test Page</center>' %></h1>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<%- include('./includes/header') %>
+<%- include('./includes/header', { csrf_token }) %>
   <div class="container-fluid songs-container">
     <div class="row">
 
@@ -59,6 +59,7 @@
                                     </td>
                                     <td>    
                                         <form action="/song/togglefav" method="post" style="display: inline;">
+                                            <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                             <input type="hidden" name="song_id" value="<%= song._id %>" />
                                             <input type="hidden" name="back_url" value="/album/<%= song.album._id %>" />
                                             <button type="submit" class="btn-link">
@@ -68,6 +69,7 @@
                                     </td>
                                     <td>
                                         <form action="/song/delete" method="post" style="display: inline;">
+                                            <input type="hidden" name="_csrf" value="<%= csrf_token %>" />
                                             <input type="hidden" name="song_id" value="<%= song._id %>" />
                                             <input type="hidden" name="back_url" value="/album/<%= song.album._id %>" />
                                             <button type="submit" class="btn btn-danger btn-xs">
@@ -86,7 +88,7 @@
                             <p><strong><%= error_message %></strong></p>
                         <% } %>
                         <!-- Add Music Form -->
-                        <%- include('./forms/add_song') %>
+                        <%- include('./forms/add_song', { csrf_token }) %>
                     <% } %>
                 </div>
             </div>

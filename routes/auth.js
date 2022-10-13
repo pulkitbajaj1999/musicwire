@@ -8,8 +8,8 @@ router.get('/login', authController.getLogin)
 // POST login
 router.post('/login', authController.postLogin)
 
-// GET logout
-router.get('/logout', authController.getLogout)
+// POST logout
+router.post('/logout', authController.postLogout)
 
 // GET Sign UP
 router.get('/signup', authController.getSignup)
