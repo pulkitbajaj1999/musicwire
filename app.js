@@ -101,11 +101,11 @@ app.use(authenticateSessionMiddleware)
 app.use(csurf())
 // serve public files
 app.use(express.static(path.join(__dirname, 'public')))
-// check in local storage for serving media files else fetch from B2 storage
-app.use(
-  '/media',
-  express.static(path.join(__dirname, 'static', 'media')),
-  (req, res, next) => {
+// serve media files from local storage
+app.use('/media', express.static(path.join(__dirname, 'static', 'media')))
+// if b2-storage flag is enabled fetch file from b2 to local
+if (process.env.ENABLE_B2_STORAGE === 'true') {
+  app.use('/media', (req, res, next) => {
     const localBaseFolder = 'static'
     const fileKey = req.originalUrl.startsWith('/')
       ? req.originalUrl.slice(1)
@@ -117,8 +117,8 @@ app.use(
         return next()
       }
     })
-  }
-)
+  })
+}
 
 // define routes
 app.get(['/', '/home'], async (req, res) => {

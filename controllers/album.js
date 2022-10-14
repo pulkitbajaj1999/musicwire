@@ -74,11 +74,9 @@ module.exports.postCreateAlbum = async (req, res) => {
   if (req.files && req.files.album_logo) {
     const file = req.files.album_logo[0]
     const fileKey = `media/albums/${file.filename}`
-    const uploadResult = await b2.uploadFile(fileKey, file.path)
-    if (uploadResult) {
-      album.imageUrl = '/' + uploadResult.Key // file-key will act as a file path on b2
-    } else {
-      album.imageUrl = '/images/default_album_logo.png'
+    album.imageUrl = '/' + fileKey
+    if (process.env.ENABLE_B2_STORAGE === 'true') {
+      await b2.uploadFile(fileKey, file.path)
     }
   }
   // else store the default logo
@@ -183,9 +181,9 @@ module.exports.postAddSongToAlbum = async (req, res) => {
   if (req.files && req.files.audio_file) {
     const file = req.files.audio_file[0]
     const fileKey = `media/songs/${file.filename}`
-    const uploadResult = await b2.uploadFile(fileKey, file.path)
-    if (uploadResult) {
-      song.audioFile = '/' + uploadResult.Key // file-key will act as a file path on b2
+    song.audioFile = '/' + fileKey
+    if (process.env.ENABLE_B2_STORAGE === 'true') {
+      await b2.uploadFile(fileKey, file.path)
     }
   }
   song
