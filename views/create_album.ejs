@@ -4,12 +4,22 @@
         <div class="col-sm-12 col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <h3>Add a New Album</h3>
-                    <% if (locals.error_message) { %>
-                        <p><strong><%= error_message %></strong></p>
+                    <% if (locals.path && locals.path==='/album/edit') { %>
+                        <h3>Edit Album: <span><%= album._id %></span></h3>
+                        <% if (locals.error_message) { %>
+                            <p><strong><%= error_message %></strong></p>
+                        <% } else { %>
+                            <%- include('./forms/add_album', { csrf_token, album}) %>
+                        <% } %>
                     <% } else { %>
-                        <%- include('./forms/add_album', { csrf_token }) %>
+                        <h3>Add a New Album</h3>
+                        <% if (locals.error_message) { %>
+                            <p><strong><%= error_message %></strong></p>
+                        <% } else { %>
+                            <%- include('./forms/add_album', { csrf_token }) %>
+                        <% } %>
                     <% } %>
+                    
                 </div>
             </div>
         </div>        

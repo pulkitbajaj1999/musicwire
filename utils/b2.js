@@ -53,6 +53,22 @@ module.exports.fetchFileToLocal = (fileKey, localBaseFolder) => {
     })
 }
 
+module.exports.deleteFile = (fileKey) => {
+  return s3
+    .deleteObject({
+      Bucket: process.env.B2_BUCKET_NAME,
+      Key: fileKey,
+    })
+    .promise()
+    .then((result) => {
+      console.log('Delete from B2 result:', result)
+    })
+    .catch((err) => {
+      console.log('Error while deleting object!\n', err)
+      return null
+    })
+}
+
 // get filestream for downloading from b2
 module.exports.getFileStream = async (fileKey) => {
   try {

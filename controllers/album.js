@@ -97,6 +97,65 @@ module.exports.postCreateAlbum = async (req, res) => {
     })
 }
 
+module.exports.getEditAlbum = (req, res) => {
+  const albumId = req.query.album_id
+  Album.findById(albumId)
+    .lean()
+    .then((album) => {
+      if (album) {
+        return res.render('create_album', {
+          path: '/album/edit',
+          album: album,
+          isLoggedIn: req.isLoggedIn,
+          csrf_token: req.csrfToken(),
+        })
+      } else {
+        return res.render('500InternalServerError', {
+          isLoggedIn: req.isLoggedIn,
+          csrf_token: req.csrfToken(),
+        })
+      }
+    })
+}
+
+module.exports.postEditAlbum = async (req, res) => {
+  const { albumId, album_title, artist, genre } = req.body
+  Album.findById(albumId)
+    .then((album) => {
+      album.title = album_title
+      album.artist = artist
+      album.genre = genre
+      // if image for album logo is uploaded then replace old image in b2 bucket
+      if (req.files && req.files.album_logo) {
+        const file = req.files.album_logo[0]
+        const fileKey = `media/albums/${file.filename}`
+        const prevFileKey = album.imageUrl.startsWith('/')
+          ? album.imageUrl.slice(1)
+          : album.imageUrl
+        album.imageUrl = '/' + fileKey
+        if (process.env.ENABLE_B2_STORAGE === 'true') {
+          return Promise.all([
+            b2.deleteFile(prevFileKey),
+            b2.uploadFile(fileKey, file.path),
+          ]).then(() => {
+            return album.save()
+          })
+        }
+      }
+      return album.save()
+    })
+    .then((album) => {
+      res.redirect('/album')
+    })
+    .catch((err) => {
+      console.log('Error while editing album!\n', err)
+      return res.render('500InternalServerError', {
+        isLoggedIn: req.isLoggedIn,
+        csrf_token: req.csrfToken(),
+      })
+    })
+}
+
 module.exports.postDeleteAlbum = (req, res) => {
   const albumId = req.body.album_id
   const backUrl = req.body.back_url

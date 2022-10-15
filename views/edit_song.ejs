@@ -1,0 +1,14 @@
+<%- include('./includes/header', { csrf_token }) %>
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <%- include('./forms/add_song', { song }) %>
+                </div>
+            </div>
+        </div>        
+    </div>
+  </div>
+</body>
+</html>

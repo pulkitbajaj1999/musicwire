@@ -11,6 +11,12 @@ router.get('/add', albumController.getCreateAlbum)
 // POST create album
 router.post('/add', albumController.postCreateAlbum)
 
+// GET edit album page
+router.get('/edit', albumController.getEditAlbum)
+
+// POST edit album
+router.post('/edit', albumController.postEditAlbum)
+
 // POST delete album
 router.post('/delete', albumController.postDeleteAlbum)
 
