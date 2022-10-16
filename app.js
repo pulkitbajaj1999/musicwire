@@ -112,6 +112,9 @@ if (process.env.ENABLE_B2_STORAGE === 'true') {
       : req.originalUrl
     b2.fetchFileToLocal(fileKey, localBaseFolder).then((buffer) => {
       if (buffer) {
+        if (fileKey.startsWith('media/song')) {
+          res.setHeader('Content-Type', 'audio/mp3')
+        }
         return res.send(buffer)
       } else {
         return next()
