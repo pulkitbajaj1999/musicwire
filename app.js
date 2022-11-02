@@ -30,7 +30,12 @@ const app = express()
 app.set('view engine', 'ejs')
 const multerStorage = multer.diskStorage({
   filename: (req, file, cb) => {
-    cb(null, new Date().getTime() + '-' + file.originalname)
+    cb(
+      null,
+      new Date().getTime() +
+        '-' +
+        file.originalname.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
+    )
   },
   destination: (req, file, cb) => {
     fs.mkdirSync('static/media/songs', { recursive: true })

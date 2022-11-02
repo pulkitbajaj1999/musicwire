@@ -12,7 +12,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <%= backUrl = filterBy==='favorite' ? '/song/favorite' : '/song' %>
+                <% backUrl = filterBy==='favorite' ? '/song/favorite' : '/song' %>
                 <%- include('./includes/song_panel', {songs, csrf_token, backUrl}) %>
             </div>
 
