@@ -201,16 +201,15 @@ app.get('/500', (req, res) => {
 app.use(notFoundRoute)
 
 // declare host and port
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8000
 const HOST = process.env.HOST || '0.0.0.0'
 const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://localhost:27017/musicwire'
 
+
 // start server
-;(() => {
-  dbConnect(MONGODB_URI).then(() => {
-    app.listen(PORT, HOST, (err) => {
-      console.log(`App started at port:${PORT}`)
-    })
+dbConnect(MONGODB_URI).then(() => {
+  app.listen(PORT, HOST, (err) => {
+    console.log(`App started at port:${PORT}`)
   })
-})()
+})
