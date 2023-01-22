@@ -7,18 +7,21 @@ const songSchema = new Schema({
     type: String,
     required: true,
   },
-  audioFile: {
+  audioUrl: {
+    type: String,
+    required: true,
+  },
+  imageUrl: {
     type: String,
     required: false,
   },
-  isfavorite: {
-    type: Boolean,
-    required: true,
-    default: false,
+  artist: {
+    type: String,
+    required: false,
   },
-  album: {
-    type: Schema.Types.ObjectId,
-    ref: 'Album',
+  description: {
+    type: String,
+    required: false,
   },
 })
 
