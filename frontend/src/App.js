@@ -1,6 +1,8 @@
 // react-libraries
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Route, Routes } from 'react-router'
+import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
 
 // thirdparty libraries
 import Box from '@mui/material/Box'
@@ -13,6 +15,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import TextField from '@mui/material/TextField'
 
 // custom components
+import { checkAuth } from './store/authActions'
+
 import TopBar from './components/TopBar'
 import Player from './components/Player/Player'
 import ResponsiveDrawer from './components/Sidebar'
@@ -24,12 +28,9 @@ import Playlists from './components/Playlists'
 import CurrentPlaylist from './components/CurrentPlaylist'
 import Home from './components/Home'
 
-// colors : {
-//   '#353739',
-//   '#181818'
-// }
-
+const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 const DRAWER_WIDTH = 250
+
 const classes = {
   closeIcon: {
     color: 'white',
@@ -49,7 +50,7 @@ const classes = {
     fontSize: '100px',
     color: 'white',
   },
-  inputFieldName: {
+  inputFieldTitle: {
     backgroundColor: '#353739',
     color: 'white',
     marginBottom: 2,
@@ -74,6 +75,24 @@ const classes = {
 }
 
 const CreatePlaylistForm = (props) => {
+  const imageFileRef = useRef()
+  const titleRef = useRef()
+  const descriptionRef = useRef()
+
+  const saveHandler = () => {
+    const formBody = new FormData()
+    formBody.append(
+      'title',
+      titleRef.current.querySelector('input#title').value
+    )
+    formBody.append(
+      'description',
+      descriptionRef.current.querySelector('textarea#description').value
+    )
+    formBody.append('imageFile', imageFileRef.current.files[0])
+    props.onSave(formBody)
+  }
+
   return (
     <React.Fragment>
       <Container sx={{ display: 'flex', padding: 0 }}>
@@ -104,17 +123,18 @@ const CreatePlaylistForm = (props) => {
             aria-label="upload picture"
             component="label"
           >
-            <input hidden accept="image/*" type="file" />
+            <input hidden accept="image/*" type="file" ref={imageFileRef} />
             <EditOutlinedIcon sx={classes.editIcon} />
           </IconButton>
         </Container>
         <Container>
           <TextField
             required
-            id="name"
-            label="Name"
+            id="title"
+            label="Title"
             variant="outlined"
-            sx={classes.inputFieldName}
+            sx={classes.inputFieldTitle}
+            ref={titleRef}
           />
           <TextField
             id="description"
@@ -122,11 +142,12 @@ const CreatePlaylistForm = (props) => {
             sx={classes.inputFieldDescription}
             multiline
             rows={4}
+            ref={descriptionRef}
           />
         </Container>
       </Box>
       <Container sx={{ display: 'flex' }}>
-        <Button variant="contained" sx={classes.saveBtn} onClick={props.onSave}>
+        <Button variant="contained" sx={classes.saveBtn} onClick={saveHandler}>
           Save
         </Button>
       </Container>
@@ -135,17 +156,35 @@ const CreatePlaylistForm = (props) => {
 }
 
 const App = () => {
+  const dispatch = useDispatch()
+  // fetching auth state
+  const authState = useSelector((state) => state.auth)
+
+  // checking authentication and setting user
+  useEffect(() => {
+    dispatch(checkAuth())
+  }, [])
+
   const [modal, setModal] = useState(null)
 
-  const openCreatePlaylistModal = () => {
-    setModal('CREATE_PLAYLIST')
-  }
   const closeModalHandler = () => {
     setModal(null)
   }
-  const savePlaylistHandler = () => {
-    console.log('save')
-    closeModalHandler()
+  const savePlaylistHandler = (payload) => {
+    const api = BASE_URL + '/api/private/playlist/add'
+    axios
+      .post(api, payload, {
+        headers: {
+          authorization: `Bearer ${authState.token}`,
+        },
+      })
+      .then((res) => {
+        closeModalHandler()
+        window.location.reload()
+      })
+      .catch((err) => {
+        console.log('__error_while_adding_playlist__', err)
+      })
   }
 
   return (
@@ -161,7 +200,7 @@ const App = () => {
       <Box sx={{ display: 'flex', marginBottom: '15vh' }}>
         <ResponsiveDrawer
           drawerWidth={DRAWER_WIDTH}
-          onClickCreatePlaylist={openCreatePlaylistModal}
+          onClickCreatePlaylist={setModal.bind(null, 'CREATE_PLAYLIST')}
         />
         <Box
           component="main"

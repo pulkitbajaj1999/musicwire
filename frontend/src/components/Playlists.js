@@ -1,64 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserPlaylists } from '../store/assetActions'
 
 import CardView from './CardView/CardView'
 
-const ARJIT_IMAGE_SRC =
-  'https://hindikhabar.com/wp-content/uploads/2022/04/arijit-singh.jpg'
-
-const static_playlists = [
-  {
-    _id: '1',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: true,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '2',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: false,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '3',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: false,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '4',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: true,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '5',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: true,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '6',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: true,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-  {
-    _id: '7',
-    title: 'Melody',
-    description: 'arjit',
-    isFavourite: true,
-    imageUrl: ARJIT_IMAGE_SRC,
-  },
-]
-
 const Playlists = () => {
-  return <CardView cards={static_playlists} />
+  const authState = useSelector((state) => state.auth)
+  const assetState = useSelector((state) => state.asset)
+  const dispatch = useDispatch()
+
+  // fetching private data
+  useEffect(() => {
+    if (authState.token) dispatch(fetchUserPlaylists(authState.token))
+  }, [authState.token])
+
+  return <CardView cards={assetState.userPlaylists} />
 }
 
 export default Playlists

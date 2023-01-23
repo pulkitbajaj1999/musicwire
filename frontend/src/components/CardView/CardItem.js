@@ -5,6 +5,8 @@ import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
 
+const BASE_URL = process.env.REACT_APP_BASE_URL || ''
+
 const CardItem = (props) => {
   return (
     <Card
@@ -15,7 +17,11 @@ const CardItem = (props) => {
         },
       }}
     >
-      <CardMedia component="img" alt="album" image={props.imageUrl} />
+      <CardMedia
+        component="img"
+        alt="album"
+        image={`${BASE_URL}/${props.imageUrl}`}
+      />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {props.title}

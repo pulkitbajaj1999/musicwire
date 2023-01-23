@@ -18,13 +18,6 @@ const Playlist = (props) => {
           </Grid>
         ))}
       </Grid>
-      <Grid container spacing={6} sx={{ padding: 8 }}>
-        {cards.map((card, i) => (
-          <Grid key={card._id} item xl={3}>
-            <CardItem {...card} />
-          </Grid>
-        ))}
-      </Grid>
     </Box>
   )
 }
