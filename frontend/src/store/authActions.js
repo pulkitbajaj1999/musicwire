@@ -12,7 +12,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 export const login = (credentials) => async (dispatch) => {
   try {
     // Send a request to the server with the credentials
-    const { data } = await axios.post('/api/auth/login', credentials)
+    const { data } = await axios.post(BASE_URL + '/api/auth/login', credentials)
 
     // Extract the token and user from the response
     const { token, user } = data
@@ -26,10 +26,10 @@ export const login = (credentials) => async (dispatch) => {
     dispatch(setIsAuthenticated(true))
   } catch (error) {
     // Extract the error message from the response
-    const { message } = error.response.data
+    const { msg } = error.response.data
 
     // Dispatch the setError action
-    dispatch(setError(message))
+    dispatch(setError(msg))
   }
 }
 

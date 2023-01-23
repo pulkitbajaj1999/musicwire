@@ -17,6 +17,7 @@ import TextField from '@mui/material/TextField'
 // custom components
 import { checkAuth } from './store/authActions'
 
+import Login from './components/Login'
 import TopBar from './components/TopBar'
 import Player from './components/Player/Player'
 import ResponsiveDrawer from './components/Sidebar'
@@ -30,6 +31,7 @@ import Home from './components/Home'
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 const DRAWER_WIDTH = 250
+const PLAYER_HEIGHT = '15vh'
 
 const classes = {
   closeIcon: {
@@ -197,15 +199,25 @@ const App = () => {
           />
         </Modal>
       )}
-      <Box sx={{ display: 'flex', marginBottom: '15vh' }}>
+      {/* Root Box */}
+      <Box
+        sx={{
+          display: 'flex',
+          marginBottom: `calc(${PLAYER_HEIGHT})`,
+          minHeight: `calc(100vh - ${PLAYER_HEIGHT})`,
+        }}
+      >
+        {/* left sidebar */}
         <ResponsiveDrawer
           drawerWidth={DRAWER_WIDTH}
           onClickCreatePlaylist={setModal.bind(null, 'CREATE_PLAYLIST')}
         />
+        {/* right sidebox */}
         <Box
           component="main"
           sx={{
-            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
             width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
           }}
         >
@@ -216,11 +228,12 @@ const App = () => {
             <Route path="/recents" element={<Recents />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/current" element={<CurrentPlaylist />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Box>
       </Box>
-      <Player height={'15vh'} />
+      <Player height={PLAYER_HEIGHT} />
     </React.Fragment>
   )
 }

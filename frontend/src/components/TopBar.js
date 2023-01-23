@@ -1,16 +1,22 @@
-import * as React from 'react'
+// To-do
+// handle email in avatar
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
+
 import { styled, alpha } from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import InputBase from '@mui/material/InputBase'
-// import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
-import AccountCircle from '@mui/icons-material/AccountCircle'
+import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
+
+import { logout } from '../store/authActions'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -23,6 +29,7 @@ const Search = styled('div')(({ theme }) => ({
   width: '100%',
   [theme.breakpoints.up('sm')]: {
     marginLeft: theme.spacing(1),
+    marginRight: '1rem',
     width: 'auto',
   },
 }))
@@ -55,14 +62,37 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const TopBar = () => {
+  const authState = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  // component states
   const [anchorEl, setAnchorEl] = React.useState(null)
   const isMenuOpen = Boolean(anchorEl)
 
+  // component handlers
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
   }
-
   const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+  const handleClickLogin = () => {
+    navigate('/login')
+  }
+
+  const dispatchMenuAction = (item) => {
+    switch (item) {
+      // authenticated
+      case 'PROFILE':
+        console.log('profile-selected')
+        break
+
+      case 'LOGOUT':
+        dispatch(logout())
+        navigate('/login', { replace: true })
+        break
+    }
     setAnchorEl(null)
   }
 
@@ -83,23 +113,30 @@ const TopBar = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      {/* user is not logged */}
+      {!authState.isAuthenticated && (
+        <MenuItem onClick={dispatchMenuAction.bind(null, 'LOGIN')}>
+          Login
+        </MenuItem>
+      )}
+      {/* user is logged in */}
+      {authState.isAuthenticated && (
+        <MenuItem onClick={dispatchMenuAction.bind(null, 'PROFILE')}>
+          Profile
+        </MenuItem>
+      )}
+      {authState.isAuthenticated && (
+        <MenuItem onClick={dispatchMenuAction.bind(null, 'LOGOUT')}>
+          Logout
+        </MenuItem>
+      )}
     </Menu>
   )
 
   return (
     <React.Fragment>
       <AppBar position="static" style={{ backgroundColor: '#181818' }}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-          >
-            {/* Musicwire */}
-          </Typography>
+        <Toolbar sx={{ justifyContent: 'right' }}>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -110,17 +147,28 @@ const TopBar = () => {
             />
           </Search>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={'primary-search-account-menu'}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            {authState.isAuthenticated && (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={'primary-search-account-menu'}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <Avatar>{authState.user.email[0].toUpperCase()}</Avatar>
+              </IconButton>
+            )}
+            {!authState.isAuthenticated && (
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={handleClickLogin}
+              >
+                Login
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
