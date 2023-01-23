@@ -9,11 +9,14 @@ const bodyparser = require('body-parser')
 const multer = require('multer')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const bcryptjs = require('bcryptjs')
 // const csurf = require('csurf')
-const helmet = require('helmet')
+// const helmet = require('helmet')
+const cors = require('cors')
 const compression = require('compression')
 
 // local imports
+const User = require('./models/user')
 const b2 = require('./utils/b2')
 const dbConnect = require('./utils/db').dbConnect
 const jwtAuthMiddleware = require('./middlewares/jwtAuth')
@@ -83,6 +86,7 @@ const mongodbSessionStore = new MongoDBStore({
 //   })
 // )
 // app.use(helmet())
+app.use(cors())
 
 // using compression
 app.use(compression())
@@ -179,8 +183,26 @@ const HOST = process.env.HOST || '0.0.0.0'
 const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://localhost:27017/musicwire'
 
+const SALT_LENGTH = 12
 // start server
 dbConnect(MONGODB_URI).then(() => {
+  User.findOne({ role: 'ADMIN' })
+    .then((admin) => {
+      if (!admin) {
+        const password = process.env.ADMIN_PASS || 'admin'
+        bcryptjs.hash(password, SALT_LENGTH).then((hashedPassword) => {
+          const defaultAdmin = new User({
+            email: 'admin@musicwire',
+            password: hashedPassword,
+            role: 'ADMIN',
+          })
+          return defaultAdmin.save()
+        })
+      }
+    })
+    .catch((err) => {
+      console.log('__error_while_creating_default_admin__', err)
+    })
   app.listen(PORT, HOST, (err) => {
     console.log(`App started at port:${PORT}`)
   })

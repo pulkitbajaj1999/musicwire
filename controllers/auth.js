@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs')
 const User = require('../models/user')
 
 const LOGIN_PERIOD_SEC = 36000
+const SALT_LENGTH = 12
 const JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-key'
 
 module.exports.getLoggedUser = (req, res, next) => {
@@ -135,7 +136,7 @@ module.exports.postSignup = (req, res, next) => {
         profile: { name: name },
       })
       return bcryptjs
-        .hash(password, 12)
+        .hash(password, SALT_LENGTH)
         .then((hashedPassword) => {
           newUser.password = hashedPassword
           return newUser.save()
