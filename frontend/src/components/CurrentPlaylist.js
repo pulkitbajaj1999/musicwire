@@ -5,7 +5,7 @@ import ListView from './ListView/ListView'
 
 const CurrentPlaylist = () => {
   const assetState = useSelector((state) => state.asset)
-  return <ListView songs={assetState.current} />
+  return <ListView songs={assetState.currentPlaylist} />
 }
 
 export default CurrentPlaylist

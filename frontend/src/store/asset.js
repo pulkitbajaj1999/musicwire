@@ -8,7 +8,7 @@ const assetSlice = createSlice({
     songs: [],
     recents: [],
     favorites: [],
-    current: [],
+    currentPlaylist: [],
     error: null,
   },
   reducers: {
@@ -27,7 +27,7 @@ const assetSlice = createSlice({
     setFavorites: (state, action) => {
       state.favorites = action.payload
     },
-    setCurrent: (state, action) => {
+    setCurrentPlaylist: (state, action) => {
       state.current = action.payload
     },
     addRecent: (state, action) => {
@@ -49,7 +49,7 @@ export const {
   setUserPlaylists,
   setRecents,
   setFavorites,
-  setCurrent,
+  setCurrentPlaylist,
   setError,
 } = assetSlice.actions
 export default assetSlice.reducer

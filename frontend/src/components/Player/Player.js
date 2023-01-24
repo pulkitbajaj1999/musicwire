@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import {
+  setCurrentSong,
+  setVolume,
+  setIsPlaying,
+  toggleDisable,
+} from '../../store/player'
 
 import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
@@ -26,41 +32,40 @@ const classes = {
   },
 }
 
-const SONG_IMAGE_SRC =
-  'https://c.saavncdn.com/704/Ek-Vari-English-2021-20210813032021-500x500.jpg'
-
-const SONG_AUDIO_SRC =
-  'https://hanzluo.s3-us-west-1.amazonaws.com/music/wuyuwuqing.mp3'
-
-const DEFAULT_VOLUME = 10
+const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 
 const isNumber = (value) => {
   return typeof value === 'number' && isFinite(value)
 }
 
 function Player(props) {
-  const assetState = useSelector((state) => state.asset)
+  const playerState = useSelector((state) => state.player)
+  const dispatch = useDispatch()
 
+  const isDisabled = playerState?.disabled
+  const isPlaying = playerState?.isPlaying
   const [audio, setAudio] = useState(null)
   const [duration, setDuration] = useState(null)
-  const [isPlaying, setIsPlaying] = useState(null)
   const [muted, setMuted] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [progressTime, setProgressTime] = useState(0) // 0 to 100
-  const [progressVolume, setProgressVolume] = useState(DEFAULT_VOLUME) // 0 to 100
 
   // initialize the song from the audio src
   useEffect(() => {
-    const audioElement = new Audio(SONG_AUDIO_SRC)
-    audioElement.volume = DEFAULT_VOLUME / 100
-    setAudio(audioElement) // takes <src, volume, loop, autoplay >
-    setIsPlaying(false)
-    audio?.pause()
-  }, [])
+    if (playerState && playerState.currentSong) {
+      const currentSong = playerState.currentSong
+      const audioElement = new Audio(`${BASE_URL}/${currentSong.audioUrl}`)
+      audioElement.volume = playerState.volume / 100
+      if (playerState.isPlaying) audioElement.play()
+      setAudio(audioElement) // takes <src, volume, loop, autoplay >
+      setProgressTime(0)
+      // dispatch(setIsPlaying(false))
+      audio?.pause()
+    }
+  }, [playerState?.currentSong])
 
   // refreshing current-time and progress time each second if song is playing
   useEffect(() => {
-    console.log('----------use-effect--------')
     if (audio && isNumber(audio.duration) && isPlaying) {
       const interval = setInterval(() => {
         console.log('----updating-progress-time-----')
@@ -75,7 +80,7 @@ function Player(props) {
   // resetting values on song completion
   useEffect(() => {
     if (progressTime === 100) {
-      setIsPlaying(false)
+      dispatch(setIsPlaying(false))
       setProgressTime(0)
       setCurrentTime(0)
     }
@@ -84,22 +89,21 @@ function Player(props) {
   const handlePlay = () => {
     console.log('play')
     audio.play()
-    setIsPlaying(true)
+    dispatch(setIsPlaying(true))
   }
   const handlePause = () => {
     console.log('pause')
     audio.pause()
-    setIsPlaying(false)
+    dispatch(setIsPlaying(false))
   }
   const handleVolumeChange = (e) => {
     console.log('volume-change', e.target?.value)
     const progressVolume = e.target.value
-    setProgressVolume(progressVolume)
+    dispatch(setVolume(progressVolume))
     audio.volume = progressVolume / 100
   }
   const handleCurrentTimeChange = (e) => {
     console.log('time-change', e.target?.value)
-    console.log('duration', duration)
     // check if song duration is present
     if (isNaN(duration)) return
     const currentTime = (e.target.value / 100) * duration
@@ -137,17 +141,21 @@ function Player(props) {
     >
       <Container maxWidth="sm" sx={{ width: '10%' }}>
         <img
-          src={SONG_IMAGE_SRC}
+          src={
+            isDisabled
+              ? '/no_song.jpg'
+              : `${BASE_URL}/${playerState?.currentSong?.imageUrl}`
+          }
           style={{ width: '80px', height: '80px' }}
           alt="song"
         />
       </Container>
       <Container sx={{ width: '20%' }}>
         <Typography variant="body1" component="h2">
-          Maya Teri Ram
+          {playerState?.currentSong?.title}
         </Typography>
         <Typography variant="body2" component="h2">
-          Shubh
+          {playerState?.currentSong?.artist}
         </Typography>
       </Container>
       <Container
@@ -159,20 +167,36 @@ function Player(props) {
       >
         {/* player main controls */}
         <Container sx={{ width: 'fit-content' }}>
-          <IconButton sx={classes.playerControlBtn} onClick={handlePrevious}>
+          <IconButton
+            sx={classes.playerControlBtn}
+            onClick={handlePrevious}
+            disabled={isDisabled}
+          >
             <SkipPreviousIcon sx={classes.playerControlIcon} />
           </IconButton>
           {!isPlaying && (
-            <IconButton sx={classes.playerControlBtn} onClick={handlePlay}>
+            <IconButton
+              sx={classes.playerControlBtn}
+              onClick={handlePlay}
+              disabled={isDisabled}
+            >
               <PlayCircleIcon sx={classes.playerControlIcon} />
             </IconButton>
           )}
           {isPlaying && (
-            <IconButton sx={classes.playerControlBtn} onClick={handlePause}>
+            <IconButton
+              sx={classes.playerControlBtn}
+              onClick={handlePause}
+              disabled={isDisabled}
+            >
               <PauseOutlinedIcon sx={classes.playerControlIcon} />
             </IconButton>
           )}
-          <IconButton sx={classes.playerControlBtn} onClick={handleNext}>
+          <IconButton
+            sx={classes.playerControlBtn}
+            onClick={handleNext}
+            disabled={isDisabled}
+          >
             <SkipNextIcon sx={classes.playerControlIcon} />
           </IconButton>
         </Container>
@@ -184,6 +208,7 @@ function Player(props) {
           valueLabelDisplay="auto"
           value={progressTime}
           onChange={handleCurrentTimeChange}
+          disabled={isDisabled}
         />
       </Container>
       {/* player volume controls */}
@@ -197,8 +222,9 @@ function Player(props) {
           defaultValue={70}
           aria-label="Small"
           valueLabelDisplay="auto"
-          value={progressVolume}
+          value={playerState?.volume}
           onChange={handleVolumeChange}
+          disabled={isDisabled}
         />
       </Container>
     </AppBar>

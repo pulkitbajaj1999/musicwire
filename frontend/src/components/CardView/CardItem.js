@@ -1,4 +1,6 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { setCurrentSong } from '../../store/player'
 
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -8,6 +10,12 @@ import Typography from '@mui/material/Typography'
 const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 
 const CardItem = (props) => {
+  const dispatch = useDispatch()
+  const setCurrentSongHandler = () => {
+    if (props.audioUrl) {
+      dispatch(setCurrentSong(props))
+    }
+  }
   return (
     <Card
       sx={{
@@ -16,6 +24,7 @@ const CardItem = (props) => {
           boxShadow: 20,
         },
       }}
+      onClick={setCurrentSongHandler}
     >
       <CardMedia
         component="img"
