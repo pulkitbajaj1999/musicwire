@@ -59,6 +59,7 @@ module.exports.getPlaylistById = (req, res, next) => {
     })
 
   Playlist.findById(playlistId)
+    .populate('songs')
     .lean()
     .then((playlist) => {
       if (!playlist)
