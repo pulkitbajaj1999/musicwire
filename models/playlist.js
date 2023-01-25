@@ -22,6 +22,12 @@ const playListSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  songs: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Playlist',
+    },
+  ],
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',

@@ -4,6 +4,7 @@ const b2 = require('../utils/b2')
 // models
 const User = require('../models/user')
 const Playlist = require('../models/playlist')
+const Song = require('../models/song')
 
 module.exports.getPublicPlaylists = (req, res, next) => {
   Playlist.find({ isPublic: true })
@@ -65,7 +66,7 @@ module.exports.getPlaylistById = (req, res, next) => {
           status: 'error',
           msg: 'playlist not present',
         })
-      return res.status(500).json({
+      return res.status(200).json({
         status: 'ok',
         msg: 'playlist-by-id fetch success',
         playlist: playlist,
@@ -225,6 +226,87 @@ module.exports.deletePlaylist = (req, res, next) => {
         status: 'ok',
         msg: 'playlist deleted',
         result: result,
+      })
+    })
+    .catch((err) => {
+      next(err)
+    })
+}
+
+module.exports.postAddSongToPlaylist = (req, res, next) => {
+  const { playlistId, songId } = req.body
+  if (!playlistId || !songId)
+    return res.status(400).json({
+      status: 'error',
+      msg: 'playlistId or songId not provided',
+    })
+  Promise.all([Playlist.findById(playlistId), Song.findById(songId)])
+    .then(([playlist, song]) => {
+      if (!playlist)
+        return res.status(404).json({
+          status: 'error',
+          msg: 'playlist not exist',
+        })
+      if (!song)
+        return res.status(404).json({
+          status: 'error',
+          msg: 'song not found',
+        })
+      if (playlist.songs.indexOf(songId) === -1) {
+        playlist.songs.push(songId)
+        return playlist.save().then((playlist) => {
+          return res.status(200).json({
+            status: 'ok',
+            msg: 'song added to playlist',
+            playlist: playlist,
+          })
+        })
+      }
+      return res.status(200).json({
+        status: 'ok',
+        msg: 'song already present',
+        playlist: playlist,
+      })
+    })
+    .catch((err) => {
+      next(err)
+    })
+}
+
+module.exports.patchDeleteSongFromPlaylist = (req, res, next) => {
+  const { playlistId, songId } = req.body
+  if (!playlistId || !songId)
+    return res.status(400).json({
+      status: 'error',
+      msg: 'playlistId or songId not provided',
+    })
+  Promise.all([Playlist.findById(playlistId), Song.findById(songId)])
+    .then(([playlist, song]) => {
+      if (!playlist)
+        return res.status(404).json({
+          status: 'error',
+          msg: 'playlist not exist',
+        })
+      if (!song)
+        return res.status(404).json({
+          status: 'error',
+          msg: 'song not found',
+        })
+      const index = playlist.songs.indexOf(songId)
+      if (index !== -1) {
+        playlist.songs.splice(index, 1)
+        return playlist.save().then((playlist) => {
+          return res.status(200).json({
+            status: 'ok',
+            msg: 'song deleted from playlist',
+            playlist: playlist,
+          })
+        })
+      }
+      return res.status(404).json({
+        status: 'error',
+        msg: 'song not present in playlist',
+        playlist: playlist,
       })
     })
     .catch((err) => {

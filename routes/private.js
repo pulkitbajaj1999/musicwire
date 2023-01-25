@@ -29,4 +29,13 @@ router.patch('/playlist', playlistController.patchEditPlaylist)
 // DELETE playlist
 router.delete('/playlist', playlistController.deletePlaylist)
 
+// POST add song to playlist
+router.post('/playlist/addsong', playlistController.postAddSongToPlaylist)
+
+// PATCH delete song from playlist
+router.patch(
+  '/playlist/deletesong',
+  playlistController.patchDeleteSongFromPlaylist
+)
+
 module.exports = router
