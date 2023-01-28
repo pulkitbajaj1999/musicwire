@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { addRecent } from '../../store/asset'
 import { addToPlaylist, toggleFavorite } from '../../store/assetActions'
 import { setCurrentSong } from '../../store/player'
 
@@ -50,6 +51,7 @@ const ListItem = (props) => {
   const playSongHandler = () => {
     console.log('props', props)
     dispatch(setCurrentSong(props.song))
+    dispatch(addRecent(props.song))
   }
   const favoriteHandler = () => {
     dispatch(toggleFavorite(authState.token, props.song._id))

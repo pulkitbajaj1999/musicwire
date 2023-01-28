@@ -57,6 +57,7 @@ export const {
   setRecents,
   setFavorites,
   setCurrentPlaylist,
+  addRecent,
   updatePlaylist,
   setError,
 } = assetSlice.actions
