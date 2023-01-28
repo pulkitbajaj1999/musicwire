@@ -104,14 +104,21 @@ module.exports.patchToggleFavorite = (req, res, next) => {
           status: 'error',
           msg: 'song not present',
         })
-      return user.toggleFavorite(songId)
+      return user
+        .toggleFavorite(songId)
+        .then((user) => {
+          return user.populate('favorites')
+        })
+        .then((user) => {
+          return res.status(200).json({
+            status: 'ok',
+            msg: 'favorite toggled',
+            favorites: user.favorites,
+          })
+        })
     })
-    .then((user) => {
-      return res.status(200).json({
-        status: 'ok',
-        msg: 'favorite toggled',
-        user: user,
-      })
+    .catch((err) => {
+      next(err)
     })
 }
 
