@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 
+import { setCurrentPlaylist } from '../store/asset'
+
 import ListView from './ListView/ListView'
-import { useSelector } from 'react-redux'
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 
 const PlaylistById = (props) => {
   const assetState = useSelector((state) => state.asset)
+  const dispatch = useDispatch()
   const params = useParams()
   const playlistId = params.id
   const [songs, setSongs] = useState([])
@@ -25,11 +28,17 @@ const PlaylistById = (props) => {
     }
   }
 
+  const updateCurrentPlaylist = () => {
+    dispatch(setCurrentPlaylist(songs))
+  }
+
   useEffect(() => {
     fetchSongs()
   }, [])
 
-  return <ListView songs={songs} />
+  return (
+    <ListView songs={songs} updateCurrentPlaylist={updateCurrentPlaylist} />
+  )
 }
 
 export default PlaylistById

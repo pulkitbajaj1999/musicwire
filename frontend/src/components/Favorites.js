@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { setCurrentPlaylist } from '../store/asset'
 import { fetchFavorites } from '../store/assetActions'
 
 import ListView from './ListView/ListView'
@@ -13,7 +14,15 @@ const Favorites = () => {
     if (authState.token) dispatch(fetchFavorites(authState.token))
   }, [authState.token])
 
-  return <ListView songs={assetState.favorites} />
+  const updateCurrentPlaylist = () => {
+    dispatch(setCurrentPlaylist(assetState.favorites))
+  }
+  return (
+    <ListView
+      songs={assetState.favorites}
+      updateCurrentPlaylist={updateCurrentPlaylist}
+    />
+  )
 }
 
 export default Favorites

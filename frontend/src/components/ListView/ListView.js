@@ -45,7 +45,11 @@ const ListView = (props) => {
         </TableHead>
         <TableBody>
           {props.songs.map((song) => (
-            <ListItem key={song._id} song={song} />
+            <ListItem
+              key={song._id}
+              song={song}
+              updateCurrentPlaylist={props.updateCurrentPlaylist}
+            />
           ))}
         </TableBody>
       </Table>

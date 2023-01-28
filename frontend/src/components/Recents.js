@@ -1,11 +1,23 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { setCurrentPlaylist } from '../store/asset'
 
 import ListView from './ListView/ListView'
 
 const Recents = () => {
   const assetState = useSelector((state) => state.asset)
-  return <ListView songs={assetState.recents} />
+  const dispatch = useDispatch()
+
+  const updateCurrentPlaylist = () => {
+    dispatch(setCurrentPlaylist(assetState.recents))
+  }
+
+  return (
+    <ListView
+      songs={assetState.recents}
+      updateCurrentPlaylist={updateCurrentPlaylist}
+    />
+  )
 }
 
 export default Recents

@@ -4,12 +4,14 @@ const playerSlice = createSlice({
   name: 'player',
   initialState: {
     disabled: true,
+    currentIdx: 0,
     currentSong: null,
     isPlaying: false,
     volume: 70,
   },
   reducers: {
     setCurrentSong: (state, action) => {
+      state.currentIdx = 0
       state.currentSong = action.payload
       state.disabled = false
     },
@@ -22,9 +24,17 @@ const playerSlice = createSlice({
     toggleDisable: (state, action) => {
       state.disabled = !state.disabled
     },
+    setCurrentIdx: (state, action) => {
+      state.currentIdx = action.payload
+    },
   },
 })
 
-export const { setCurrentSong, setVolume, setIsPlaying, toggleDisable } =
-  playerSlice.actions
+export const {
+  setCurrentSong,
+  setVolume,
+  setIsPlaying,
+  toggleDisable,
+  setCurrentIdx,
+} = playerSlice.actions
 export default playerSlice.reducer

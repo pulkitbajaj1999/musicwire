@@ -4,7 +4,7 @@ import {
   setCurrentSong,
   setVolume,
   setIsPlaying,
-  toggleDisable,
+  setCurrentIdx,
 } from '../../store/player'
 
 import AppBar from '@mui/material/AppBar'
@@ -39,6 +39,7 @@ const isNumber = (value) => {
 }
 
 function Player(props) {
+  const assetState = useSelector((state) => state.asset)
   const playerState = useSelector((state) => state.player)
   const dispatch = useDispatch()
 
@@ -77,15 +78,6 @@ function Player(props) {
     }
   }, [audio, isPlaying])
 
-  // resetting values on song completion
-  useEffect(() => {
-    if (progressTime === 100) {
-      dispatch(setIsPlaying(false))
-      setProgressTime(0)
-      setCurrentTime(0)
-    }
-  }, [progressTime])
-
   const handlePlay = () => {
     console.log('play')
     audio.play()
@@ -119,11 +111,34 @@ function Player(props) {
 
   const handlePrevious = () => {
     console.log('prev')
+    if (playerState.currentIdx === 0) return
+    const currentPlaylist = assetState.currentPlaylist
+    const size = currentPlaylist.length
+    const currentIdx = playerState.currentIdx
+    const prevIdx = currentIdx - 1
+    dispatch(setCurrentSong(currentPlaylist[prevIdx]))
+    dispatch(setCurrentIdx(prevIdx))
   }
 
   const handleNext = () => {
     console.log('next')
+    const currentPlaylist = assetState.currentPlaylist
+    const size = currentPlaylist.length
+    const currentIdx = playerState.currentIdx
+    const nextIdx = (currentIdx + 1) % size
+    dispatch(setCurrentSong(currentPlaylist[nextIdx]))
+    dispatch(setCurrentIdx(nextIdx))
   }
+
+  // resetting values on song completion
+  useEffect(() => {
+    if (progressTime === 100) {
+      dispatch(setIsPlaying(false))
+      handleNext()
+      setProgressTime(0)
+      setCurrentTime(0)
+    }
+  }, [progressTime])
 
   return (
     <AppBar

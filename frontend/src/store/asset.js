@@ -28,7 +28,7 @@ const assetSlice = createSlice({
       state.favorites = action.payload
     },
     setCurrentPlaylist: (state, action) => {
-      state.current = action.payload
+      state.currentPlaylist = action.payload
     },
     addRecent: (state, action) => {
       const recentSong = action.payload
