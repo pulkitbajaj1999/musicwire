@@ -4,6 +4,7 @@ import {
   setPublicPlaylists,
   setUserPlaylists,
   setFavorites,
+  updatePlaylist,
   setError,
 } from './asset'
 
@@ -18,10 +19,10 @@ export const fetchSongs = () => async (dispatch) => {
     dispatch(setSongs(songs))
   } catch (error) {
     // Extract the error message from the response
-    const { message } = error.response.data
+    const { msg } = error.response.data
 
     // Dispatch the setError action
-    dispatch(setError(message))
+    dispatch(setError(msg))
   }
 }
 
@@ -34,10 +35,10 @@ export const fetchPublicPlaylists = (token) => async (dispatch) => {
     dispatch(setPublicPlaylists(playlists))
   } catch (error) {
     // Extract the error message from the response
-    const { message } = error.response.data
+    const { msg } = error.response.data
 
     // Dispatch the setError action
-    dispatch(setError(message))
+    dispatch(setError(msg))
   }
 }
 
@@ -52,10 +53,10 @@ export const fetchUserPlaylists = (token) => async (dispatch) => {
     dispatch(setUserPlaylists(data.playlists))
   } catch (error) {
     // Extract the error message from the response
-    const { message } = error.response.data
+    const { msg } = error.response.data
 
     // Dispatch the setError action
-    dispatch(setError(message))
+    dispatch(setError(msg))
   }
 }
 
@@ -70,9 +71,55 @@ export const fetchFavorites = (token) => async (dispatch) => {
     dispatch(setFavorites(songs))
   } catch (error) {
     // Extract the error message from the response
-    const { message } = error.response.data
+    const { msg } = error.response.data
 
     // Dispatch the setError action
-    dispatch(setError(message))
+    dispatch(setError(msg))
+  }
+}
+
+export const addToPlaylist =
+  (token, playlistId, songId) => async (dispatch) => {
+    try {
+      // Send a request to the server with the credentials
+      const { data } = await axios.post(
+        BASE_URL + '/api/private/playlist/addsong',
+        {
+          playlistId: playlistId,
+          songId: songId,
+        },
+        {
+          headers: { authorization: `Bearer ${token}` },
+        }
+      )
+      if (data?.playlist) dispatch(updatePlaylist(data.playlist))
+    } catch (error) {
+      // Extract the error message from the response
+      const { msg } = error.response.data
+
+      // Dispatch the setError action
+      dispatch(setError(msg))
+    }
+  }
+
+export const toggleFavorite = (token, songId) => async (dispatch) => {
+  try {
+    // Send a request to the server with the credentials
+    const { data } = await axios.patch(
+      BASE_URL + '/api/private/favorite/toggle',
+      {
+        songId: songId,
+      },
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    )
+    if (data?.favorites) dispatch(setFavorites(data.favorites))
+  } catch (error) {
+    // Extract the error message from the response
+    const { msg } = error.response.data
+
+    // Dispatch the setError action
+    dispatch(setError(msg))
   }
 }

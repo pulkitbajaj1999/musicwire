@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 import { setCurrentSong } from '../../store/player'
 
 import Card from '@mui/material/Card'
@@ -11,9 +12,13 @@ const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 
 const CardItem = (props) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const setCurrentSongHandler = () => {
     if (props.audioUrl) {
       dispatch(setCurrentSong(props))
+    } else {
+      navigate(`/playlist/${props._id}`)
     }
   }
   return (

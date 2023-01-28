@@ -9,11 +9,6 @@ const Playlists = () => {
   const assetState = useSelector((state) => state.asset)
   const dispatch = useDispatch()
 
-  // fetching private data
-  useEffect(() => {
-    if (authState.token) dispatch(fetchUserPlaylists(authState.token))
-  }, [authState.token])
-
   return <CardView cards={assetState.userPlaylists} />
 }
 

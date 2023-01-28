@@ -28,6 +28,8 @@ import Recents from './components/Recents'
 import Playlists from './components/Playlists'
 import CurrentPlaylist from './components/CurrentPlaylist'
 import Home from './components/Home'
+import PlaylistById from './components/PlaylistById'
+import { fetchFavorites, fetchUserPlaylists } from './store/assetActions'
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || ''
 const DRAWER_WIDTH = 250
@@ -167,6 +169,14 @@ const App = () => {
     dispatch(checkAuth())
   }, [])
 
+  // fetching user playlists and user favorites when the app loads
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      dispatch(fetchUserPlaylists(authState?.token))
+      dispatch(fetchFavorites(authState?.token))
+    }
+  }, [authState.isAuthenticated])
+
   const [modal, setModal] = useState(null)
 
   const closeModalHandler = () => {
@@ -225,6 +235,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/playlists" element={<Playlists />} />
+            <Route path="/playlist/:id" element={<PlaylistById />} />
             <Route path="/recents" element={<Recents />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/current" element={<CurrentPlaylist />} />

@@ -44,13 +44,8 @@ const ListView = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.songs.map((songs) => (
-            <ListItem
-              key={songs._id}
-              {...songs}
-              onClickPlay={playSongHandler}
-              onClickFavorite={toggleFavoriteSong}
-            />
+          {props.songs.map((song) => (
+            <ListItem key={song._id} song={song} />
           ))}
         </TableBody>
       </Table>

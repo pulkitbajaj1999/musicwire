@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchSongs, fetchPublicPlaylists } from '../store/assetActions'
 
 import CardView from './CardView/CardView'
+import ListView from './ListView/ListView'
 
 const Home = () => {
   const assetState = useSelector((state) => state.asset)
@@ -16,8 +17,8 @@ const Home = () => {
 
   return (
     <React.Fragment>
+      <ListView songs={assetState.songs} />
       <CardView cards={assetState.publicPlaylists} />
-      <CardView cards={assetState.songs} />
     </React.Fragment>
   )
 }

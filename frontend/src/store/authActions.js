@@ -65,7 +65,8 @@ export const checkAuth = () => async (dispatch) => {
     dispatch(setUser(user))
     dispatch(setIsAuthenticated(true))
   } catch (error) {
+    const { msg } = error.response.data
     // Dispatch the setError action
-    dispatch(setError(error.message))
+    dispatch(setError(msg))
   }
 }

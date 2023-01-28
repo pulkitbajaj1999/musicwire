@@ -40,6 +40,13 @@ const assetSlice = createSlice({
     setError: (state, action) => {
       console.log('__error_in_asset_store__', action.payload)
     },
+    updatePlaylist: (state, action) => {
+      const updatedPlaylist = action.payload
+      state.userPlaylists = state.userPlaylists.map((playlist) => {
+        if (playlist._id === updatedPlaylist._id) return updatedPlaylist
+        else return playlist
+      })
+    },
   },
 })
 
@@ -50,6 +57,7 @@ export const {
   setRecents,
   setFavorites,
   setCurrentPlaylist,
+  updatePlaylist,
   setError,
 } = assetSlice.actions
 export default assetSlice.reducer
