@@ -1,6 +1,6 @@
 // To-do
 // handle email in avatar
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
@@ -67,7 +67,8 @@ const TopBar = () => {
   const navigate = useNavigate()
 
   // component states
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [query, setQuery] = useState('')
+  const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
 
   // component handlers
@@ -133,6 +134,12 @@ const TopBar = () => {
     </Menu>
   )
 
+  const querySubmitHandler = (e) => {
+    e.preventDefault()
+    navigate(`/search?q=${query}`)
+    setQuery('')
+  }
+
   return (
     <React.Fragment>
       <AppBar position="static" style={{ backgroundColor: '#181818' }}>
@@ -141,10 +148,14 @@ const TopBar = () => {
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
+            <form onSubmit={querySubmitHandler}>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </form>
           </Search>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             {authState.isAuthenticated && (

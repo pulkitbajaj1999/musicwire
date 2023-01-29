@@ -28,6 +28,7 @@ import Recents from './components/Recents'
 import Playlists from './components/Playlists'
 import CurrentPlaylist from './components/CurrentPlaylist'
 import Home from './components/Home'
+import Search from './components/Search'
 import PlaylistById from './components/PlaylistById'
 import { fetchFavorites, fetchUserPlaylists } from './store/assetActions'
 
@@ -234,6 +235,7 @@ const App = () => {
           <TopBar />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/playlists" element={<Playlists />} />
             <Route path="/playlist/:id" element={<PlaylistById />} />
             <Route path="/recents" element={<Recents />} />
