@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 
 // import PropTypes from 'prop-types'
@@ -14,6 +15,7 @@ import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined'
 import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined'
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined'
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
@@ -49,6 +51,7 @@ const classes = {
 }
 
 const ResponsiveDrawer = (props) => {
+  const authState = useSelector((state) => state.auth)
   const location = useLocation()
   const drawer = (
     <div>
@@ -175,6 +178,21 @@ const ResponsiveDrawer = (props) => {
             <ListItemText primary={'Create Playlist'} />
           </ListItemButton>
         </ListItem>
+        {authState.isAuthenticated && authState?.user?.role === 'ADMIN' && (
+          <ListItem
+            key={'addSong'}
+            sx={classes.listItem}
+            disablePadding
+            onClick={props.onClickAddSong}
+          >
+            <ListItemButton>
+              <ListItemIcon>
+                <AddCircleOutlineOutlinedIcon sx={classes.sidebarIcon} />
+              </ListItemIcon>
+              <ListItemText primary={'Add Song'} />
+            </ListItemButton>
+          </ListItem>
+        )}
       </List>
     </div>
   )

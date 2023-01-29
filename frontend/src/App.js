@@ -160,6 +160,94 @@ const CreatePlaylistForm = (props) => {
   )
 }
 
+const AddSongForm = (props) => {
+  const imageFileRef = useRef()
+  const audioFileRef = useRef()
+  const titleRef = useRef()
+  const artistRef = useRef()
+  const descriptionRef = useRef()
+
+  const saveHandler = () => {
+    const formBody = new FormData()
+    formBody.append(
+      'title',
+      titleRef.current.querySelector('input#title').value
+    )
+    formBody.append(
+      'description',
+      descriptionRef.current.querySelector('textarea#description').value
+    )
+    formBody.append('imageFile', imageFileRef.current.files[0])
+    formBody.append('audioFile', audioFileRef.current.files[0])
+    props.onSave(formBody)
+  }
+
+  return (
+    <React.Fragment>
+      <Container sx={{ display: 'flex', padding: 0 }}>
+        <Typography>Add Song</Typography>
+        <IconButton
+          aria-label="delete"
+          sx={{ marginLeft: 'auto' }}
+          onClick={props.onClose}
+        >
+          <CloseIcon sx={classes.closeIcon} />
+        </IconButton>
+      </Container>
+      <Box
+        sx={{
+          display: 'flex',
+          paddingLeft: 'auto',
+          marginBottom: 2,
+        }}
+      >
+        <Container>
+          <IconButton
+            color="primary"
+            sx={classes.editButton}
+            aria-label="upload picture"
+            component="label"
+          >
+            <input hidden accept="image/*" type="file" ref={imageFileRef} />
+            <EditOutlinedIcon sx={classes.editIcon} />
+          </IconButton>
+        </Container>
+        <Container>
+          <TextField
+            required
+            id="title"
+            label="Title"
+            variant="outlined"
+            sx={classes.inputFieldTitle}
+            ref={titleRef}
+          />
+          <TextField
+            id="artist"
+            label="artist"
+            variant="outlined"
+            sx={classes.inputFieldTitle}
+            ref={artistRef}
+          />
+          <TextField
+            id="description"
+            label="Description"
+            sx={classes.inputFieldDescription}
+            multiline
+            rows={3}
+            ref={descriptionRef}
+          />
+        </Container>
+      </Box>
+      <Container sx={{ display: 'flex' }}>
+        <input accept="audio/*" type="file" ref={audioFileRef} />
+        <Button variant="contained" sx={classes.saveBtn} onClick={saveHandler}>
+          Save
+        </Button>
+      </Container>
+    </React.Fragment>
+  )
+}
+
 const App = () => {
   const dispatch = useDispatch()
   // fetching auth state
@@ -200,6 +288,23 @@ const App = () => {
       })
   }
 
+  const addSongHandler = (payload) => {
+    const api = BASE_URL + '/api/admin/song/add'
+    axios
+      .post(api, payload, {
+        headers: {
+          authorization: `Bearer ${authState.token}`,
+        },
+      })
+      .then((res) => {
+        closeModalHandler()
+        window.location.reload()
+      })
+      .catch((err) => {
+        console.log('__error_while_adding_song__', err)
+      })
+  }
+
   return (
     <React.Fragment>
       {modal === 'CREATE_PLAYLIST' && (
@@ -208,6 +313,11 @@ const App = () => {
             onClose={closeModalHandler}
             onSave={savePlaylistHandler}
           />
+        </Modal>
+      )}
+      {modal === 'ADD_SONG' && (
+        <Modal onCloseOverlay={closeModalHandler}>
+          <AddSongForm onClose={closeModalHandler} onSave={addSongHandler} />
         </Modal>
       )}
       {/* Root Box */}
@@ -222,6 +332,7 @@ const App = () => {
         <ResponsiveDrawer
           drawerWidth={DRAWER_WIDTH}
           onClickCreatePlaylist={setModal.bind(null, 'CREATE_PLAYLIST')}
+          onClickAddSong={setModal.bind(null, 'ADD_SONG')}
         />
         {/* right sidebox */}
         <Box
