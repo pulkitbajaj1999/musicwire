@@ -133,4 +133,4 @@ dist
 .prettierignore
 
 # static files
-static
+/static
