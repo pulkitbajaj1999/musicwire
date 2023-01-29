@@ -24,6 +24,10 @@ import Toolbar from '@mui/material/Toolbar'
 // import Typography from '@mui/material/Typography'
 
 const classes = {
+  logo: {
+    objectFit: 'contain',
+    overflow: 'hidden',
+  },
   sidebarIcon: {
     color: 'white',
   },
@@ -46,11 +50,11 @@ const classes = {
 
 const ResponsiveDrawer = (props) => {
   const location = useLocation()
-  console.log('location', location)
-  console.log('')
   const drawer = (
     <div>
-      <Toolbar />
+      <Toolbar>
+        <img src="/musicwire_logo.png" style={classes.logo} />
+      </Toolbar>
       <Divider />
       <List>
         <Link style={{ textDecoration: 'none', color: 'inherit' }} to="/">
