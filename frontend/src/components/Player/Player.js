@@ -45,7 +45,10 @@ function Player(props) {
 
   const isDisabled = playerState?.disabled
   const isPlaying = playerState?.isPlaying
+
+  // props for audio element
   const [audio, setAudio] = useState(null)
+  const [readyState, setReadyState] = useState(null)
   const [duration, setDuration] = useState(null)
   const [muted, setMuted] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -59,49 +62,56 @@ function Player(props) {
       audioElement.volume = playerState.volume / 100
       if (playerState.isPlaying) audioElement.play()
       setAudio(audioElement) // takes <src, volume, loop, autoplay >
+      setReadyState(audioElement.readyState)
       setProgressTime(0)
-      // dispatch(setIsPlaying(false))
-      audio?.pause()
+      setCurrentTime(0)
+      // removing the audio element on component dismount or reinitializing
+      return () => {
+        audioElement.src = null
+      }
     }
   }, [playerState?.currentSong])
 
   // refreshing current-time and progress time each second if song is playing
   useEffect(() => {
+    if (audio) {
+      audio.onloadedmetadata = () => {
+        setReadyState(audio.readyState)
+      }
+    }
     if (audio && isNumber(audio.duration) && isPlaying) {
+      setDuration(audio?.duration)
       const interval = setInterval(() => {
-        console.log('----updating-progress-time-----')
-        setDuration(audio.duration)
         setCurrentTime(audio?.currentTime)
         setProgressTime((audio?.currentTime / audio?.duration) * 100)
       }, 1000)
       return () => clearTimeout(interval)
     }
-  }, [audio, isPlaying])
+  }, [audio, readyState, isPlaying])
 
   const handlePlay = () => {
-    console.log('play')
     audio.play()
     dispatch(setIsPlaying(true))
   }
   const handlePause = () => {
-    console.log('pause')
     audio.pause()
     dispatch(setIsPlaying(false))
   }
   const handleVolumeChange = (e) => {
-    console.log('volume-change', e.target?.value)
     const progressVolume = e.target.value
     dispatch(setVolume(progressVolume))
     audio.volume = progressVolume / 100
   }
   const handleCurrentTimeChange = (e) => {
-    console.log('time-change', e.target?.value)
-    // check if song duration is present
+    // if song has no duration defined return
     if (isNaN(duration)) return
-    const currentTime = (e.target.value / 100) * duration
-    setProgressTime(e.target.value)
-    setCurrentTime(currentTime)
+    // change the current time of audio element
+    const progressTime = e.target?.value
+    // check if song duration is present
+    const currentTime = (progressTime / 100) * duration
     audio.currentTime = currentTime
+    setProgressTime(progressTime)
+    setCurrentTime(currentTime)
   }
 
   const handleToggleMute = () => {
@@ -110,20 +120,29 @@ function Player(props) {
   }
 
   const handlePrevious = () => {
-    console.log('prev')
-    if (playerState.currentIdx === 0) return
     const currentPlaylist = assetState.currentPlaylist
     const size = currentPlaylist.length
+    if (size === 1) {
+      audio.currentTime = 0
+      setProgressTime(0)
+      setCurrentTime(0)
+      return
+    }
     const currentIdx = playerState.currentIdx
-    const prevIdx = currentIdx - 1
+    const prevIdx = (currentIdx - 1 + size) % size
     dispatch(setCurrentSong(currentPlaylist[prevIdx]))
     dispatch(setCurrentIdx(prevIdx))
   }
 
   const handleNext = () => {
-    console.log('next')
     const currentPlaylist = assetState.currentPlaylist
     const size = currentPlaylist.length
+    if (size === 1) {
+      audio.currentTime = 0
+      setProgressTime(0)
+      setCurrentTime(0)
+      return
+    }
     const currentIdx = playerState.currentIdx
     const nextIdx = (currentIdx + 1) % size
     dispatch(setCurrentSong(currentPlaylist[nextIdx]))
@@ -133,10 +152,7 @@ function Player(props) {
   // resetting values on song completion
   useEffect(() => {
     if (progressTime === 100) {
-      dispatch(setIsPlaying(false))
       handleNext()
-      setProgressTime(0)
-      setCurrentTime(0)
     }
   }, [progressTime])
 
