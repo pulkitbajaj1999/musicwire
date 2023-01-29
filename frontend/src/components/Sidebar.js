@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 // import PropTypes from 'prop-types'
 // import AppBar from '@mui/material/AppBar'
@@ -32,6 +32,12 @@ const classes = {
       backgroundColor: '#353739',
       borderRadius: '0.5rem',
     },
+    marginBottom: '0.5rem',
+  },
+  listItemSelected: {
+    backgroundColor: '#353739',
+    borderRadius: '0.5rem',
+    marginBottom: '0.5rem',
   },
   dividor: {
     color: 'white',
@@ -39,13 +45,24 @@ const classes = {
 }
 
 const ResponsiveDrawer = (props) => {
+  const location = useLocation()
+  console.log('location', location)
+  console.log('')
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
         <Link style={{ textDecoration: 'none', color: 'inherit' }} to="/">
-          <ListItem key={'home'} sx={classes.listItem} disablePadding>
+          <ListItem
+            key={'home'}
+            sx={
+              location.pathname === '/'
+                ? classes.listItemSelected
+                : classes.listItem
+            }
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <HomeOutlinedIcon sx={classes.sidebarIcon} />
@@ -58,7 +75,15 @@ const ResponsiveDrawer = (props) => {
           style={{ textDecoration: 'none', color: 'inherit' }}
           to="/playlists"
         >
-          <ListItem key={'playlists'} sx={classes.listItem} disablePadding>
+          <ListItem
+            key={'playlists'}
+            sx={
+              location.pathname === '/playlists'
+                ? classes.listItemSelected
+                : classes.listItem
+            }
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <PlaylistPlayOutlinedIcon sx={classes.sidebarIcon} />
@@ -71,7 +96,15 @@ const ResponsiveDrawer = (props) => {
           style={{ textDecoration: 'none', color: 'inherit' }}
           to="/recents"
         >
-          <ListItem key={'recents'} sx={classes.listItem} disablePadding>
+          <ListItem
+            key={'recents'}
+            sx={
+              location.pathname === '/recents'
+                ? classes.listItemSelected
+                : classes.listItem
+            }
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <HistoryOutlinedIcon sx={classes.sidebarIcon} />
@@ -84,7 +117,15 @@ const ResponsiveDrawer = (props) => {
           style={{ textDecoration: 'none', color: 'inherit' }}
           to="/favorites"
         >
-          <ListItem key={'favorites'} sx={classes.listItem} disablePadding>
+          <ListItem
+            key={'favorites'}
+            sx={
+              location.pathname === '/favorites'
+                ? classes.listItemSelected
+                : classes.listItem
+            }
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <GradeOutlinedIcon sx={classes.sidebarIcon} />
@@ -102,7 +143,11 @@ const ResponsiveDrawer = (props) => {
         >
           <ListItem
             key={'currentPlaylist'}
-            sx={classes.listItem}
+            sx={
+              location.pathname === '/current'
+                ? classes.listItemSelected
+                : classes.listItem
+            }
             disablePadding
           >
             <ListItemButton>
