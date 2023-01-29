@@ -177,7 +177,7 @@ function Player(props) {
               ? '/no_song.jpg'
               : `${BASE_URL}/${playerState?.currentSong?.imageUrl}`
           }
-          style={{ width: '80px', height: '80px' }}
+          style={{ width: '100px', height: '100px' }}
           alt="song"
         />
       </Container>
@@ -236,7 +236,7 @@ function Player(props) {
           size="small"
           defaultValue={70}
           aria-label="Small"
-          valueLabelDisplay="auto"
+          valueLabelDisplay="off"
           value={progressTime}
           onChange={handleCurrentTimeChange}
           disabled={isDisabled}
