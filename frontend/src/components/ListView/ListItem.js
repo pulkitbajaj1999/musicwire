@@ -108,7 +108,10 @@ const ListItem = (props) => {
       <TableCell align="left">{props.song.title}</TableCell>
       <TableCell align="left">{props.song.artist}</TableCell>
       <TableCell align="left">
-        <IconButton onClick={favoriteHandler}>
+        <IconButton
+          onClick={favoriteHandler}
+          disabled={!authState.isAuthenticated}
+        >
           {isFavorite ? <StarIcon /> : <StarBorderIcon />}
         </IconButton>
       </TableCell>
