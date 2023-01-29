@@ -91,7 +91,7 @@ const TopBar = () => {
 
       case 'LOGOUT':
         dispatch(logout())
-        navigate('/login', { replace: true })
+        window.location.replace('/login')
         break
     }
     setAnchorEl(null)
