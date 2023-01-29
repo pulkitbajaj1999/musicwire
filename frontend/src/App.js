@@ -174,6 +174,10 @@ const AddSongForm = (props) => {
       titleRef.current.querySelector('input#title').value
     )
     formBody.append(
+      'artist',
+      artistRef.current.querySelector('input#artist').value
+    )
+    formBody.append(
       'description',
       descriptionRef.current.querySelector('textarea#description').value
     )
