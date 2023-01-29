@@ -7,7 +7,16 @@ const User = require('../models/user')
 
 // controllers
 module.exports.getSongs = (req, res, next) => {
-  Song.find()
+  const searchQuery = req.query.q
+  const options = searchQuery
+    ? {
+        $or: [
+          { title: { $regex: searchQuery, $options: 'i' } },
+          { artist: { $regex: searchQuery, $options: 'i' } },
+        ],
+      }
+    : {}
+  Song.find(options)
     .lean()
     .then((songs) => {
       return res.status(200).json({

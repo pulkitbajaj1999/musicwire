@@ -7,7 +7,16 @@ const Playlist = require('../models/playlist')
 const Song = require('../models/song')
 
 module.exports.getPublicPlaylists = (req, res, next) => {
-  Playlist.find({ isPublic: true })
+  const searchQuery = req.query.q
+  const options = searchQuery
+    ? {
+        $or: [
+          { title: { $regex: searchQuery, $options: 'i' } },
+          { description: { $regex: searchQuery, $options: 'i' } },
+        ],
+      }
+    : {}
+  Playlist.find({ isPublic: true, ...options })
     .lean()
     .then((playlists) => {
       return res.status(200).json({
