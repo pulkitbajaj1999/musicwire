@@ -120,10 +120,11 @@ app.use(
 app.use(jwtAuthMiddleware.setAuth)
 // app.use(csurf())
 
-// serve public files
-app.use(express.static(path.join(__dirname, 'public')))
-// serve media files from local storage
-app.use('/media', express.static(path.join(__dirname, 'static', 'media')))
+
+// serve media files from local storage if ENABLE_B2_STORAGE IS FALSE
+// app.use('/media', express.static(path.join(__dirname, 'static', 'media')))
+
+
 // if b2-storage flag is enabled fetch file from b2 to local
 if (process.env.ENABLE_B2_STORAGE === 'true') {
   app.use('/media', (req, res, next) => {
@@ -145,14 +146,14 @@ if (process.env.ENABLE_B2_STORAGE === 'true') {
 }
 
 // serving routes
-app.use('/api/public', publicRoutes)
-app.use('/api/auth', authRoutes)
+app.use('/public', publicRoutes)
+app.use('/auth', authRoutes)
 app.use(
-  '/api/private',
+  '/private',
   jwtAuthMiddleware.checkRole(['ADMIN', 'USER', 'GUEST']),
   privateRoutes
 )
-app.use('/api/admin', jwtAuthMiddleware.checkRole(['ADMIN']), adminRoutes)
+app.use('/admin', jwtAuthMiddleware.checkRole(['ADMIN']), adminRoutes)
 
 // handle Internal server errors
 app.use((err, req, res, next) => {
@@ -164,16 +165,6 @@ app.use((err, req, res, next) => {
     })
   }
   // if no error found continue to next routes
-  next()
-})
-
-// serve static files from frontend build
-app.use(express.static(path.join(__dirname, 'frontend', 'build')))
-// serve frontend routes
-
-app.get('/*', (req, res, next) => {
-  const indexPath = path.join(__dirname, 'frontend', 'build', 'index.html')
-  if (fs.existsSync(indexPath)) return res.status(200).sendFile(indexPath)
   next()
 })
 
