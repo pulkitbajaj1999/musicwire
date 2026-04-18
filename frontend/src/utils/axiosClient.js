@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { VITE_BASE_API_URL } from '../constants';
+import { VITE_API_BASE_URL } from '../constants';
 
 const axiosClient = axios.create({
-  baseURL: VITE_BASE_API_URL,
+  baseURL: VITE_API_BASE_URL,
   timeout: 10000, // 10 seconds timeout
   headers: {
     'Content-Type': 'application/json',

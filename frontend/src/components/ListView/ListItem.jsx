@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addRecent, setCurrentPlaylist } from '../../store/asset'
 import { addToPlaylist, toggleFavorite } from '../../store/assetActions'
 import { setCurrentSong } from '../../store/player'
-import { VITE_BASE_API_URL } from '../../constants'
 import { generateImageUrl } from '../../utils/common'
 
 // third-party libraries
