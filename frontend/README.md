@@ -14,7 +14,7 @@ A modern React-based music streaming web application built with Vite, featuring 
 
 ## Tech Stack
 
-- **Frontend Framework**: React 18
+- **Frontend Framework**: React 19
 - **Build Tool**: Vite
 - **UI Library**: Material-UI (MUI)
 - **State Management**: Redux Toolkit
