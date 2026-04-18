@@ -1,3 +1,6 @@
 .vscode
+temp/
+*.log
+.env
 frontend-old
 node_modules
