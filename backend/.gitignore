@@ -1,0 +1,52 @@
+# --- Dependencies ---
+node_modules/
+jspm_packages/
+package-lock.json
+# Note: Some teams prefer committing package-lock.json. 
+# Remove it from here if you want to track exact dependency versions.
+
+# --- Environment Variables & Secrets ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# --- VS Code Files ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# --- Logs & Debugging ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# --- Build & Output ---
+dist/
+build/
+out/
+.next/
+.cache/
+
+# --- OS Specific Files ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Testing & Coverage ---
+coverage/
+.nyc_output/
+
+# --- Documentation ---
+# If you generate docs, ignore the output folder
+docs/site/
