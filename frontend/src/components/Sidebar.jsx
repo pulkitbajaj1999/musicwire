@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useResolvedPath } from 'react-router-dom'
 
 // import PropTypes from 'prop-types'
 // import AppBar from '@mui/material/AppBar'
@@ -24,6 +24,8 @@ import ListItemText from '@mui/material/ListItemText'
 // import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 // import Typography from '@mui/material/Typography'
+
+import musicwire_logo from '../assets/musicwire_logo.png'
 
 const classes = {
   logo: {
@@ -53,10 +55,12 @@ const classes = {
 const ResponsiveDrawer = (props) => {
   const authState = useSelector((state) => state.auth)
   const location = useLocation()
+  console.log('resolved-home:', useResolvedPath('/'))
+  console.log('location:', location)
   const drawer = (
     <div>
       <Toolbar>
-        <img src="/musicwire_logo.png" style={classes.logo} />
+        <img src={musicwire_logo} style={classes.logo} />
       </Toolbar>
       <Divider />
       <List>
@@ -64,7 +68,7 @@ const ResponsiveDrawer = (props) => {
           <ListItem
             key={'home'}
             sx={
-              location.pathname === '/'
+              location.pathname === useResolvedPath('/').pathname
                 ? classes.listItemSelected
                 : classes.listItem
             }
@@ -85,7 +89,7 @@ const ResponsiveDrawer = (props) => {
           <ListItem
             key={'playlists'}
             sx={
-              location.pathname === '/playlists'
+              location.pathname === useResolvedPath('/playlists').pathname
                 ? classes.listItemSelected
                 : classes.listItem
             }
@@ -106,7 +110,7 @@ const ResponsiveDrawer = (props) => {
           <ListItem
             key={'recents'}
             sx={
-              location.pathname === '/recents'
+              location.pathname === useResolvedPath('/recents').pathname
                 ? classes.listItemSelected
                 : classes.listItem
             }
@@ -127,7 +131,7 @@ const ResponsiveDrawer = (props) => {
           <ListItem
             key={'favorites'}
             sx={
-              location.pathname === '/favorites'
+              location.pathname === useResolvedPath('/favorites').pathname
                 ? classes.listItemSelected
                 : classes.listItem
             }
@@ -151,7 +155,7 @@ const ResponsiveDrawer = (props) => {
           <ListItem
             key={'currentPlaylist'}
             sx={
-              location.pathname === '/current'
+              location.pathname === useResolvedPath('/current').pathname
                 ? classes.listItemSelected
                 : classes.listItem
             }

@@ -10,11 +10,8 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Row from '@mui/material/TableRow'
 import Col from '@mui/material/TableCell'
+import login_page_bg_image from '../assets/login_page_bg.jpeg'
 
-// const BACKGROUND_SRC =
-//   'https://thumbs.dreamstime.com/b/d-icon-music-player-blue-violet-neon-notes-isolated-black-background-140031611.jpg'
-
-const BACKGROUND_SRC = '/login_page_bg.jpeg'
 const CssTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: 'white',
@@ -74,7 +71,7 @@ const Login = () => {
       className="content mainContent"
       // sx={{ backgroundColor: '#353739', height: '100vh', width: '100vw' }}
       sx={{
-        backgroundImage: `url(${BACKGROUND_SRC})`,
+        backgroundImage: `url(${login_page_bg_image})`,
         backgroundPosition: 'right',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',

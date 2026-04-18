@@ -6,10 +6,12 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './App.css'
 
+import { BASE_URL } from './constants'
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename={BASE_URL}>
       <App />
     </BrowserRouter>
   </Provider>

@@ -20,6 +20,8 @@ import SkipNextIcon from '@mui/icons-material/SkipNext'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp'
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute'
 
+import no_song_image from '../../assets/no_song.jpg'
+
 const classes = {
   playerControlBtn: {
     '&:hover': {
@@ -173,7 +175,7 @@ function Player(props) {
         <img
           src={
             isDisabled
-              ? '/no_song.jpg'
+              ? no_song_image
               : generateImageUrl(playerState?.currentSong?.imageUrl)
           }
           style={{ width: '100px', height: '100px' }}
