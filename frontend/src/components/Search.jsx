@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import axiosClient from '../utils/axiosClient'
 
 import CardView from './CardView/CardView'
 import ListView from './ListView/ListView'
+
+import axiosClient from '../utils/axiosClient'
 
 
 const Search = () => {
@@ -17,7 +18,7 @@ const Search = () => {
   // fetching private data
   useEffect(() => {
     let fetchSongEndpoint = `/public/songs?${searchParams.toString()}`
-    axios
+    axiosClient
       .get(fetchSongEndpoint)
       .then((res) => {
         setSongs(res.data.songs)
@@ -27,7 +28,7 @@ const Search = () => {
       })
 
     let fetchPlaylistEndpoint =`/public/playlists?${searchParams.toString()}`
-    axios
+    axiosClient
       .get(fetchPlaylistEndpoint)
       .then((res) => {
         setPlaylists(res.data.playlists)
